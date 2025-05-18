@@ -53,6 +53,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          token_format: 'id_token'
+          workload_identity_provider: 'projects/397434637430/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+          service_account: 'github-actions-publisher@hive-pics.iam.gserviceaccount.com'
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker europe-docker.pkg.dev --quiet
+      
       # Download the build artifacts
       - name: Download build artifacts
         uses: actions/download-artifact@v4
