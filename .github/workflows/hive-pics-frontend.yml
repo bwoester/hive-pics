@@ -15,6 +15,10 @@ on:
       - 'hive-pics-frontend/**'
       - '.github/workflows/hive-pics-frontend.yml'
 
+permissions:
+  id-token: write
+  contents: read
+  
 jobs:
   build:
 
