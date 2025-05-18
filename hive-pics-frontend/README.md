@@ -62,3 +62,11 @@ npm run test:e2e -- --debug
 ```sh
 npm run lint
 ```
+# Vue.js Application
+
+## Docker Instructions
+
+### Building the Docker Image
+
+```bash
+docker build -t hive-pics .

@@ -1,0 +1,15 @@
+*.md
+.idea
+.dockerignore
+.editorconfig
+.git
+.gitattributes
+.gitignore
+.prettierrc.json
+.vscode
+Dockerfile
+coverage
+dist
+e2e
+node_modules
+npm-debug.log
