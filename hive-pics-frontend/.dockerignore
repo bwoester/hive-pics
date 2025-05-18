@@ -9,7 +9,6 @@
 .vscode
 Dockerfile
 coverage
-dist
 e2e
 node_modules
 npm-debug.log
