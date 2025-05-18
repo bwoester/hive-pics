@@ -40,3 +40,30 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm run test:unit -- --run
+
+      # Upload the build artifacts for the docker job
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: hive-pics-frontend/dist
+
+  docker:
+    needs: build  # This ensures docker job runs only after successful build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Download the build artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: hive-pics-frontend/dist
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: hive-pics-frontend
+          push: false  # Set to true if you want to push to a registry
+          tags: hive-pics-frontend:latest
