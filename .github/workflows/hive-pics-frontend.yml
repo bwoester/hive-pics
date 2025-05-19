@@ -16,31 +16,48 @@ on:
       - '.github/workflows/hive-pics-frontend.yml'
 
 jobs:
-  build:
 
+  # 1. Compatibility Tests: Run on PRs or regularly to track regressions.
+  compatibility-test:
+    name: Compatibility Tests (Matrix)
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        node-version: [22.x, 24.x]
     defaults:
       run:
         working-directory: hive-pics-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          node-version: ${{ matrix.node-version }}
+          cache-dependency-path: hive-pics-frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm run test:unit -- --run
 
+  # 2. Build & Test for Current Production Runtime
+  build:
+    name: Build and Unit Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hive-pics-frontend
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js 22.x
       uses: actions/setup-node@v4
       with:
         cache: 'npm'
-        node-version: ${{ matrix.node-version }}
+        node-version: 22.x
         cache-dependency-path: hive-pics-frontend/package-lock.json
     - run: npm ci
     - run: npm run build --if-present
     - run: npm run test:unit -- --run
-
       # Upload the build artifacts for the docker job
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -48,38 +65,39 @@ jobs:
         name: dist
         path: hive-pics-frontend/dist
 
+  # 3. Build Docker Image from Production Build
   docker:
-    needs: build  # This ensures docker job runs only after successful build
+    name: Docker Build
+    needs: build
     runs-on: ubuntu-latest
-
     permissions:
       id-token: write
       contents: read
-    
     steps:
       - uses: actions/checkout@v4
-
-      # See https://github.com/google-github-actions/auth?tab=readme-ov-file#preferred-direct-workload-identity-federation
-      - uses: 'google-github-actions/auth@v2'
-        with:
-          project_id: 'hive-pics'
-          workload_identity_provider: 'projects/397434637430/locations/global/workloadIdentityPools/github/providers/my-repo'
-    
-      - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker europe-docker.pkg.dev --quiet
-      
-      # Download the build artifacts
+        # Download the build artifacts
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: hive-pics-frontend/dist
+        # See https://github.com/google-github-actions/auth?tab=readme-ov-file#preferred-direct-workload-identity-federation
+      - uses: 'google-github-actions/auth@v2'
+        with:
+          project_id: 'hive-pics'
+          workload_identity_provider: 'projects/397434637430/locations/global/workloadIdentityPools/github/providers/my-repo'
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker europe-docker.pkg.dev --quiet
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: hive-pics-frontend
-          push: false  # Set to true if you want to push to a registry
+          push: true
           tags: hive-pics-frontend:latest
+
+# 4. Deploy to Dev/Test Environment
+# 5. E2E Tests (e.g., Playwright, Cypress)
+# 6. Deploy to Production (Only on Main / Manual Trigger)
