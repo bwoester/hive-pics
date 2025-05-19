@@ -51,9 +51,15 @@ jobs:
   docker:
     needs: build  # This ensures docker job runs only after successful build
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+    
     steps:
       - uses: actions/checkout@v4
-      
+
+      # See https://github.com/google-github-actions/auth?tab=readme-ov-file#preferred-direct-workload-identity-federation
       - uses: 'google-github-actions/auth@v2'
         with:
           project_id: 'hive-pics'
