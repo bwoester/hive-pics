@@ -15,10 +15,6 @@ on:
       - 'hive-pics-frontend/**'
       - '.github/workflows/hive-pics-frontend.yml'
 
-permissions:
-  id-token: write
-  contents: read
-  
 jobs:
   build:
 
@@ -55,6 +51,9 @@ jobs:
   docker:
     needs: build  # This ensures docker job runs only after successful build
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
       - uses: actions/checkout@v4
       
