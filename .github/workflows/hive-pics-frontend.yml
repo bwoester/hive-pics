@@ -81,11 +81,11 @@ jobs:
         with:
           name: dist
           path: hive-pics-frontend/dist
-        # See https://github.com/google-github-actions/auth?tab=readme-ov-file#preferred-direct-workload-identity-federation
+        # See https://github.com/google-github-actions/auth?tab=readme-ov-file#workload-identity-federation-through-a-service-account
       - uses: 'google-github-actions/auth@v2'
         with:
-          project_id: 'hive-pics'
-          workload_identity_provider: 'projects/397434637430/locations/global/workloadIdentityPools/github/providers/my-repo'
+          service_account: 'github-actions@hive-pics.iam.gserviceaccount.com'
+          workload_identity_provider: 'projects/397434637430/locations/global/workloadIdentityPools/github-actions/providers/hive-pics'
       - name: Configure Docker for Artifact Registry
         run: |
           gcloud auth configure-docker europe-docker.pkg.dev --quiet
