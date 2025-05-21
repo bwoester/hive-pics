@@ -20,9 +20,9 @@ const storage = getStorage(app)
 const db = getFirestore(app)
 
 // TODO get from user's local storage
-const eventId = 'test-event';
-const nickname = 'nicky';
-const challengeId = 'test-challenge';
+const eventId = 'test-event'
+const nickname = 'nicky'
+const challengeId = 'test-challenge'
 
 /**
  * Uploads a photo to Firebase Storage and saves metadata to Firestore
@@ -33,10 +33,10 @@ const challengeId = 'test-challenge';
 export async function uploadPhotoToFirebase(file: Blob, description: string): Promise<string> {
   try {
     // Create a unique filename
-    const uuid = crypto.randomUUID();
-    const isoTimestamp = new Date().toISOString(); // e.g., "2025-05-21T17:42:12.345Z"
+    const uuid = crypto.randomUUID()
+    const isoTimestamp = new Date().toISOString() // e.g., "2025-05-21T17:42:12.345Z"
     // replace colons for safe filenames (especially on Windows)
-    const safeTimestamp = isoTimestamp.replace(/[:.]/g, "-");
+    const safeTimestamp = isoTimestamp.replace(/[:.]/g, '-')
     const filename = `images/${eventId}/${safeTimestamp}-${uuid}`
 
     // Create a reference to the storage location
