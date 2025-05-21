@@ -2,8 +2,32 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ✅ Allow reading and uploading images to specific collections
+    match /events/{eventId}/images/{imageId} {
+      allow read: if true;
+
+      allow create: if request.resource.data.nickname is string
+                    && request.resource.data.challengeId is string
+                    && request.resource.data.downloadURL is string
+                    && request.resource.data.likeCount == 0
+                    && request.resource.data.reportCount == 0;
+
+      allow update: if request.resource.data.likeCount == resource.data.likeCount + 1
+                    || request.resource.data.reportCount == resource.data.reportCount + 1;
+    }
+
+    // ✅ Nickname storage for first-time users
+    match /users/{userId} {
+      allow create: if request.auth == null;  // anonymous allowed
+      allow read: if true;
+      allow update: if false;  // nickname immutable
+    }
+
+    // ❌ Default deny for everything else
     match /{document=**} {
       allow read, write: if false;
     }
+
   }
 }

@@ -5,8 +5,18 @@ rules_version = '2';
 //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+
+    // ✅ Allow image upload and download
+    match /images/{eventId}/{imageId} {
+      allow read: if true;
+
+      allow write: if request.resource.contentType.matches('image/.*');
+    }
+
+    // ❌ Default deny for everything else
     match /{allPaths=**} {
       allow read, write: if false;
     }
+
   }
 }
