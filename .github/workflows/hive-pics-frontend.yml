@@ -95,7 +95,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: europe-docker.pkg.dev/hive-pics/containers/hive-pics-frontend
+          images: 'europe-docker.pkg.dev/hive-pics/containers/hive-pics-frontend'
           tags: |
             type=raw,value=latest
             type=sha,prefix=
@@ -112,6 +112,11 @@ jobs:
           cache-to: type=gha,mode=max
           provenance: false
           platforms: linux/amd64
+      - id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: 'hive-pics'
+          image: 'europe-docker.pkg.dev/hive-pics/containers/hive-pics-frontend'
 
 # 4. Deploy to Dev/Test Environment
 # 5. E2E Tests (e.g., Playwright, Cypress)
