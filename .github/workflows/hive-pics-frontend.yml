@@ -17,6 +17,27 @@ on:
 
 jobs:
 
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hive-pics-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          node-version: 22.x
+          cache-dependency-path: hive-pics-frontend/package-lock.json
+      - run: npm ci
+      # Quality checks
+      - run: npm run type-check
+      - run: npm run lint:check
+      - run: npm run format:check
+      # Security checks
+      - run: npm audit
+
   # 1. Compatibility Tests: Run on PRs or regularly to track regressions.
   compatibility-test:
     name: Compatibility Tests (Matrix)
@@ -38,10 +59,11 @@ jobs:
           cache-dependency-path: hive-pics-frontend/package-lock.json
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm run test:unit -- --run
+      - run: npm run test:unit:ci
 
   # 2. Build & Test for Current Production Runtime
   build:
+    needs: [validate]
     name: Build and Unit Test
     runs-on: ubuntu-latest
     defaults:
@@ -57,7 +79,7 @@ jobs:
         cache-dependency-path: hive-pics-frontend/package-lock.json
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm run test:unit -- --run
+    - run: npm run test:unit:ci
       # Upload the build artifacts for the docker job
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
@@ -68,7 +90,7 @@ jobs:
   # 3. Build Docker Image from Production Build
   docker:
     name: Docker Build
-    needs: build
+    needs: [build]
     runs-on: ubuntu-latest
     permissions:
       id-token: write
