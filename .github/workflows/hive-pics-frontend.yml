@@ -87,7 +87,28 @@ jobs:
         name: dist
         path: hive-pics-frontend/dist
 
-  # 3. Build Docker Image from Production Build
+  # 3. Deploy to Firebase Hosting
+  firebase:
+    name: Deploy to Firebase Hosting
+    needs: [build]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hive-pics-frontend
+    steps:
+      - uses: actions/checkout@v4
+        # Download the build artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: hive-pics-frontend/dist
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: npm run deploy
+
+  # 3. Deploy to Google Cloud Run
   docker:
     name: Docker Build
     needs: [build]
