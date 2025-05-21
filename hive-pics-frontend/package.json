@@ -16,7 +16,7 @@
     "lint:check": "eslint .",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "deploy": "firebase deploy --only hosting"
+    "deploy": "firebase deploy"
   },
   "dependencies": {
     "firebase": "^11.8.0",
