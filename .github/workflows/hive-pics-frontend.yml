@@ -97,7 +97,13 @@ jobs:
         working-directory: hive-pics-frontend
     steps:
       - uses: actions/checkout@v4
-        # Download the build artifacts
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          cache: 'npm'
+          node-version: 22.x
+          cache-dependency-path: hive-pics-frontend/package-lock.json
+      - run: npm ci
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -107,60 +113,6 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: npm run deploy
-
-  # 3. Deploy to Google Cloud Run
-  docker:
-    name: Docker Build
-    needs: [build]
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-        # Download the build artifacts
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: hive-pics-frontend/dist
-        # See https://github.com/google-github-actions/auth?tab=readme-ov-file#workload-identity-federation-through-a-service-account
-      - uses: 'google-github-actions/auth@v2'
-        with:
-          service_account: 'github-actions@hive-pics.iam.gserviceaccount.com'
-          workload_identity_provider: 'projects/397434637430/locations/global/workloadIdentityPools/github-actions/providers/hive-pics'
-      - name: Configure Docker for Artifact Registry
-        run: |
-          gcloud auth configure-docker europe-docker.pkg.dev --quiet
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: 'europe-docker.pkg.dev/hive-pics/containers/hive-pics-frontend'
-          tags: |
-            type=raw,value=latest
-            type=sha,prefix=
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: hive-pics-frontend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: false
-          platforms: linux/amd64
-      - id: 'deploy'
-        uses: 'google-github-actions/deploy-cloudrun@v2'
-        with:
-          region: 'europe-west1'
-          service: 'hive-pics'
-          image: 'europe-docker.pkg.dev/hive-pics/containers/hive-pics-frontend'
 
 # 4. Deploy to Dev/Test Environment
 # 5. E2E Tests (e.g., Playwright, Cypress)
