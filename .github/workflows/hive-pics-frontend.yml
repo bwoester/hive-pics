@@ -115,6 +115,7 @@ jobs:
       - id: 'deploy'
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
+          region: 'europe-west1'
           service: 'hive-pics'
           image: 'europe-docker.pkg.dev/hive-pics/containers/hive-pics-frontend'
 
