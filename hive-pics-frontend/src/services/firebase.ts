@@ -55,6 +55,8 @@ export async function uploadPhotoToFirebase(file: Blob, description: string): Pr
       description,
       filename,
       downloadURL,
+      likeCount: 0,
+      reportCount: 0,
       createdAt: serverTimestamp(),
     })
 
