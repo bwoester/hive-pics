@@ -280,7 +280,8 @@ h1 {
 .gallery-image {
   width: 100%;
   height: 240px;
-  object-fit: cover;
+  object-fit: contain;
+  background-color: #f3f3f3;
   display: block;
 }
 
