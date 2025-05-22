@@ -17,7 +17,12 @@
 
     <div v-else class="gallery-grid">
       <div v-for="image in images" :key="image.id" class="image-card">
-        <img :src="image.downloadURL" :alt="image.description" class="gallery-image" loading="lazy" />
+        <img
+          :src="image.downloadURL"
+          :alt="image.description"
+          class="gallery-image"
+          loading="lazy"
+        />
         <div class="image-metadata">
           <h3 class="image-title">{{ image.description || 'No description' }}</h3>
           <div class="metadata-details">
@@ -58,7 +63,17 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { collection, getDocs, getFirestore, query, orderBy, limit, startAfter, Timestamp, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore'
+import {
+  collection,
+  getDocs,
+  getFirestore,
+  query,
+  orderBy,
+  limit,
+  startAfter,
+  Timestamp,
+  QueryDocumentSnapshot,
+} from 'firebase/firestore'
 
 interface Image {
   id: string
@@ -79,7 +94,7 @@ const error = ref<string | null>(null)
 const hasMoreImages = ref(true)
 const batchSize = 10 // Number of images to load per batch
 const eventId = 'test-event' // TODO: Get from route or context
-let lastVisible = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
+const lastVisible = ref<QueryDocumentSnapshot | null>(null)
 const observerTarget = ref<HTMLElement | null>(null)
 
 // Function to format timestamp
@@ -94,7 +109,7 @@ function formatDate(timestamp: Timestamp | Date | null): string {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   }).format(date)
 }
 
@@ -111,18 +126,14 @@ async function fetchImages(isInitialLoad = false) {
 
     if (isInitialLoad || !lastVisible.value) {
       // Initial query
-      imagesQuery = query(
-        imagesRef,
-        orderBy('createdAt', 'desc'),
-        limit(batchSize)
-      )
+      imagesQuery = query(imagesRef, orderBy('createdAt', 'desc'), limit(batchSize))
     } else {
       // Pagination query
       imagesQuery = query(
         imagesRef,
         orderBy('createdAt', 'desc'),
         startAfter(lastVisible.value),
-        limit(batchSize)
+        limit(batchSize),
       )
     }
 
@@ -137,7 +148,7 @@ async function fetchImages(isInitialLoad = false) {
     }
 
     // Map documents to our Image interface
-    const newImages = snapshot.docs.map(doc => {
+    const newImages = snapshot.docs.map((doc) => {
       const data = doc.data()
       return {
         id: doc.id,
@@ -148,7 +159,7 @@ async function fetchImages(isInitialLoad = false) {
         likeCount: data.likeCount || 0,
         reportCount: data.reportCount || 0,
         createdAt: data.createdAt || new Date(),
-        filename: data.filename || ''
+        filename: data.filename || '',
       } as Image
     })
 
@@ -176,7 +187,7 @@ function setupIntersectionObserver() {
         fetchImages(false)
       }
     },
-    { threshold: 0.1 }
+    { threshold: 0.1 },
   )
 
   if (observerTarget.value) {
@@ -240,8 +251,12 @@ h1 {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .gallery-grid {
