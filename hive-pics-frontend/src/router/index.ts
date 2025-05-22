@@ -18,9 +18,14 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue'),
     },
     {
-      path: '/pics',
-      name: 'pics',
+      path: '/upload',
+      name: 'upload',
       component: () => import('../views/PhotoUploadView.vue'),
+    },
+    {
+      path: '/view',
+      name: 'view',
+      component: () => import('../views/PhotoGalleryView.vue'),
     },
   ],
 })
