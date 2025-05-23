@@ -41,8 +41,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { uploadPhotoToFirebase } from '@/services/firebase'
+import { useFirebaseStore } from '@/stores/firebaseStore.ts'
 
+const firebaseStore = useFirebaseStore()
 const capturedImage = ref<string | null>(null)
 const description = ref('')
 const uploadError = ref('')
@@ -88,8 +89,8 @@ async function uploadPhoto() {
     const response = await fetch(capturedImage.value)
     const blob = await response.blob()
 
-    // Upload to Firebase
-    await uploadPhotoToFirebase(blob, description.value)
+    // Upload to Firebase using the store
+    await firebaseStore.uploadPhotoToFirebase(blob, description.value)
 
     // Show success message
     uploadSuccess.value = true

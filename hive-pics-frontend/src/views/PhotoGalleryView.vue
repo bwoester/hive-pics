@@ -62,119 +62,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import {
-  collection,
-  getDocs,
-  getFirestore,
-  query,
-  orderBy,
-  limit,
-  startAfter,
-  Timestamp,
-  QueryDocumentSnapshot,
-} from 'firebase/firestore'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import type { Timestamp } from 'firebase/firestore'
+import { useFirebaseStore } from '@/stores/firebaseStore.ts'
 
-interface Image {
-  id: string
-  nickname: string
-  challengeId: string
-  description: string
-  downloadURL: string
-  likeCount: number
-  reportCount: number
-  createdAt: Timestamp | Date
-  filename: string
-}
+const firebaseStore = useFirebaseStore()
 
-const db = getFirestore()
-const images = ref<Image[]>([])
-const loading = ref(false)
-const error = ref<string | null>(null)
-const hasMoreImages = ref(true)
-const batchSize = 10 // Number of images to load per batch
-const eventId = 'test-event' // TODO: Get from route or context
-const lastVisible = ref<QueryDocumentSnapshot | null>(null)
 const observerTarget = ref<HTMLElement | null>(null)
 
-// Function to format timestamp
+// Computed properties from the store
+const images = computed(() => firebaseStore.images)
+const loading = computed(() => firebaseStore.loading)
+const error = computed(() => firebaseStore.error)
+const hasMoreImages = computed(() => firebaseStore.hasMoreImages)
+
+// Function to format timestamp using the store method
 function formatDate(timestamp: Timestamp | Date | null): string {
-  if (!timestamp) return 'Unknown date'
-
-  const date = timestamp instanceof Timestamp ? timestamp.toDate() : timestamp
-
-  // Format: May 15, 2023 - 14:30
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
-}
-
-// Function to fetch images
-async function fetchImages(isInitialLoad = false) {
-  if (loading.value || (!isInitialLoad && !hasMoreImages.value)) return
-
-  loading.value = true
-  error.value = null
-
-  try {
-    const imagesRef = collection(db, `events/${eventId}/images`)
-    let imagesQuery
-
-    if (isInitialLoad || !lastVisible.value) {
-      // Initial query
-      imagesQuery = query(imagesRef, orderBy('createdAt', 'desc'), limit(batchSize))
-    } else {
-      // Pagination query
-      imagesQuery = query(
-        imagesRef,
-        orderBy('createdAt', 'desc'),
-        startAfter(lastVisible.value),
-        limit(batchSize),
-      )
-    }
-
-    const snapshot = await getDocs(imagesQuery)
-
-    // If we got fewer documents than the batch size, we've reached the end
-    hasMoreImages.value = snapshot.docs.length === batchSize
-
-    // Store the last document for pagination
-    if (snapshot.docs.length > 0) {
-      lastVisible.value = snapshot.docs[snapshot.docs.length - 1]
-    }
-
-    // Map documents to our Image interface
-    const newImages = snapshot.docs.map((doc) => {
-      const data = doc.data()
-      return {
-        id: doc.id,
-        nickname: data.nickname || 'Anonymous',
-        challengeId: data.challengeId || 'Unknown challenge',
-        description: data.description || '',
-        downloadURL: data.downloadURL || '',
-        likeCount: data.likeCount || 0,
-        reportCount: data.reportCount || 0,
-        createdAt: data.createdAt || new Date(),
-        filename: data.filename || '',
-      } as Image
-    })
-
-    // Add new images to our collection
-    if (isInitialLoad) {
-      images.value = newImages
-    } else {
-      images.value = [...images.value, ...newImages]
-    }
-  } catch (err) {
-    console.error('Error fetching images:', err)
-    error.value = 'Failed to load images. Please try again later.'
-  } finally {
-    loading.value = false
-  }
+  return firebaseStore.formatDate(timestamp)
 }
 
 // Set up intersection observer for infinite scrolling
@@ -184,7 +88,7 @@ function setupIntersectionObserver() {
   observer = new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting && !loading.value && hasMoreImages.value) {
-        fetchImages(false)
+        firebaseStore.fetchImages(false)
       }
     },
     { threshold: 0.1 },
@@ -196,7 +100,8 @@ function setupIntersectionObserver() {
 }
 
 onMounted(() => {
-  fetchImages(true).then(() => {
+  // Initial load
+  firebaseStore.fetchImages(true).then(() => {
     // Set up the intersection observer after the first batch loads
     setupIntersectionObserver()
   })
