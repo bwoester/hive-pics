@@ -195,7 +195,7 @@ export const useFirebaseStore = defineStore('firebase', () => {
               createdAt: data.createdAt ?? new Date(),
               filename: data.filename ?? '',
             }
-            return result;
+            return result
           })
           loading.value = false
         },
