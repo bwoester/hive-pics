@@ -55,20 +55,15 @@
     <div v-if="!loading && !hasMoreImages && images.length" class="no-more-images">
       <p>No more images to load</p>
     </div>
-
-    <!-- Intersection observer target element -->
-    <div ref="observerTarget" class="observer-target"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed } from 'vue'
 import type { Timestamp } from 'firebase/firestore'
 import { useFirebaseStore } from '@/stores/firebaseStore.ts'
 
 const firebaseStore = useFirebaseStore()
-
-const observerTarget = ref<HTMLElement | null>(null)
 
 // Computed properties from the store
 const images = computed(() => firebaseStore.images)
@@ -81,37 +76,14 @@ function formatDate(timestamp: Timestamp | Date | null): string {
   return firebaseStore.formatDate(timestamp)
 }
 
-// Set up intersection observer for infinite scrolling
-let observer: IntersectionObserver | null = null
-
-function setupIntersectionObserver() {
-  observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting && !loading.value && hasMoreImages.value) {
-        firebaseStore.fetchImages(false)
-      }
-    },
-    { threshold: 0.1 },
-  )
-
-  if (observerTarget.value) {
-    observer.observe(observerTarget.value)
-  }
-}
-
 onMounted(() => {
-  // Initial load
-  firebaseStore.fetchImages(true).then(() => {
-    // Set up the intersection observer after the first batch loads
-    setupIntersectionObserver()
-  })
+  // Set up real-time subscription
+  firebaseStore.subscribeToImages()
 })
 
 onUnmounted(() => {
-  // Clean up the observer when component is unmounted
-  if (observer) {
-    observer.disconnect()
-  }
+  // Clean up subscription when component is unmounted
+  firebaseStore.unsubscribeFromImages()
 })
 </script>
 

@@ -92,6 +92,8 @@ async function uploadPhoto() {
     // Upload to Firebase using the store
     await firebaseStore.uploadPhotoToFirebase(blob, description.value)
 
+    // The real-time listener will automatically update the gallery
+
     // Show success message
     uploadSuccess.value = true
 

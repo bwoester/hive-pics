@@ -7,13 +7,13 @@ import {
   collection,
   getFirestore,
   serverTimestamp,
-  getDocs,
   query,
   orderBy,
   limit,
-  startAfter,
   Timestamp,
   QueryDocumentSnapshot,
+  onSnapshot,
+  QuerySnapshot,
 } from 'firebase/firestore'
 import type { StorageReference } from '@firebase/storage'
 
@@ -55,6 +55,8 @@ export const useFirebaseStore = defineStore('firebase', () => {
   const hasMoreImages = ref(true)
   const lastVisible = ref<QueryDocumentSnapshot | null>(null)
   const batchSize = 10 // Number of images to load per batch
+  // Reference to unsubscribe function for real-time listeners
+  const unsubscribe = ref<(() => void) | null>(null)
 
   /**
    * Uploads a photo to Firebase Storage and saves metadata to Firestore
@@ -99,73 +101,6 @@ export const useFirebaseStore = defineStore('firebase', () => {
   }
 
   /**
-   * Fetches images from Firestore
-   * @param isInitialLoad - Whether this is the initial load or a pagination request
-   */
-  async function fetchImages(isInitialLoad = false) {
-    if (loading.value || (!isInitialLoad && !hasMoreImages.value)) return
-
-    loading.value = true
-    error.value = null
-
-    try {
-      const imagesRef = collection(db, `events/${eventId.value}/images`)
-      let imagesQuery
-
-      if (isInitialLoad || !lastVisible.value) {
-        // Initial query
-        imagesQuery = query(imagesRef, orderBy('createdAt', 'desc'), limit(batchSize))
-      } else {
-        // Pagination query
-        imagesQuery = query(
-          imagesRef,
-          orderBy('createdAt', 'desc'),
-          startAfter(lastVisible.value),
-          limit(batchSize),
-        )
-      }
-
-      const snapshot = await getDocs(imagesQuery)
-
-      // If we got fewer documents than the batch size, we've reached the end
-      hasMoreImages.value = snapshot.docs.length === batchSize
-
-      // Store the last document for pagination
-      if (snapshot.docs.length > 0) {
-        lastVisible.value = snapshot.docs[snapshot.docs.length - 1]
-      }
-
-      // Map documents to our Image interface
-      const newImages = snapshot.docs.map((doc) => {
-        const data = doc.data()
-        return {
-          id: doc.id,
-          nickname: data.nickname || 'Anonymous',
-          challengeId: data.challengeId || 'Unknown challenge',
-          description: data.description || '',
-          downloadURL: data.downloadURL || '',
-          likeCount: data.likeCount || 0,
-          reportCount: data.reportCount || 0,
-          createdAt: data.createdAt || new Date(),
-          filename: data.filename || '',
-        } as Image
-      })
-
-      // Add new images to our collection
-      if (isInitialLoad) {
-        images.value = newImages
-      } else {
-        images.value = [...images.value, ...newImages]
-      }
-    } catch (err) {
-      console.error('Error fetching images:', err)
-      error.value = 'Failed to load images. Please try again later.'
-    } finally {
-      loading.value = false
-    }
-  }
-
-  /**
    * Formats a timestamp for display
    * @param timestamp - The timestamp to format
    * @returns Formatted date string
@@ -195,6 +130,12 @@ export const useFirebaseStore = defineStore('firebase', () => {
     images.value = []
     lastVisible.value = null
     hasMoreImages.value = true
+
+    // If we have an active subscription, refresh it for the new event
+    if (unsubscribe.value) {
+      unsubscribeFromImages()
+      subscribeToImages()
+    }
   }
 
   /**
@@ -220,6 +161,66 @@ export const useFirebaseStore = defineStore('firebase', () => {
     error.value = null
   }
 
+  /**
+   * Sets up a real-time listener for images
+   */
+  function subscribeToImages() {
+    // Clear any existing subscription
+    if (unsubscribe.value) {
+      unsubscribe.value()
+    }
+
+    loading.value = true
+    error.value = null
+
+    try {
+      const imagesRef = collection(db, `events/${eventId.value}/images`)
+      const imagesQuery = query(imagesRef, orderBy('createdAt', 'desc'), limit(batchSize))
+
+      // Set up the real-time listener
+      unsubscribe.value = onSnapshot(
+        imagesQuery,
+        (snapshot: QuerySnapshot) => {
+          // Map documents to our Image interface
+          images.value = snapshot.docs.map((doc) => {
+            const data = doc.data()
+            return {
+              id: doc.id,
+              nickname: data.nickname && 'Anonymous',
+              challengeId: data.challengeId && 'Unknown challenge',
+              description: data.description && '',
+              downloadURL: data.downloadURL && '',
+              likeCount: data.likeCount && 0,
+              reportCount: data.reportCount && 0,
+              createdAt: data.createdAt && new Date(),
+              filename: data.filename && '',
+            } as Image
+          })
+          loading.value = false
+        },
+        (err) => {
+          console.error('Error in snapshot listener:', err)
+          error.value = 'Failed to listen to image updates. Please try again later.'
+          loading.value = false
+        },
+      )
+    } catch (err) {
+      console.error('Error setting up snapshot listener:', err)
+      error.value = 'Failed to set up image updates. Please try again later.'
+      loading.value = false
+    }
+  }
+
+  /**
+   * Cleanup function to remove the subscription
+   */
+  function unsubscribeFromImages() {
+    if (unsubscribe.value) {
+      unsubscribe.value()
+      unsubscribe.value = null
+    }
+  }
+
   return {
     // State
     eventId,
@@ -232,11 +233,12 @@ export const useFirebaseStore = defineStore('firebase', () => {
 
     // Actions
     uploadPhotoToFirebase,
-    fetchImages,
     formatDate,
     setEventId,
     setNickname,
     setChallengeId,
     clearError,
+    subscribeToImages,
+    unsubscribeFromImages,
   }
 })
