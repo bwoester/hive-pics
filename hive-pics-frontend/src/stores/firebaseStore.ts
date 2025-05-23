@@ -184,17 +184,18 @@ export const useFirebaseStore = defineStore('firebase', () => {
           // Map documents to our Image interface
           images.value = snapshot.docs.map((doc) => {
             const data = doc.data()
-            return {
+            const result: Image = {
               id: doc.id,
-              nickname: data.nickname && 'Anonymous',
-              challengeId: data.challengeId && 'Unknown challenge',
-              description: data.description && '',
-              downloadURL: data.downloadURL && '',
-              likeCount: data.likeCount && 0,
-              reportCount: data.reportCount && 0,
-              createdAt: data.createdAt && new Date(),
-              filename: data.filename && '',
-            } as Image
+              nickname: data.nickname ?? 'Anonymous',
+              challengeId: data.challengeId ?? 'Unknown challenge',
+              description: data.description ?? '',
+              downloadURL: data.downloadURL ?? '',
+              likeCount: data.likeCount ?? 0,
+              reportCount: data.reportCount ?? 0,
+              createdAt: data.createdAt ?? new Date(),
+              filename: data.filename ?? '',
+            }
+            return result;
           })
           loading.value = false
         },
