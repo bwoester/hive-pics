@@ -1,0 +1,78 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================
+    // HOST USER DOCUMENTS
+    // =========================
+    match /users/{userId} {
+      // Allow users to read their own data
+      allow read: if request.auth.uid == userId;
+
+      // Allow creating their own profile
+      allow create: if request.auth.uid == userId;
+
+      // Only allow updating allowed fields
+      allow update: if request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'profile.name',
+          'profile.email'
+        ]);
+
+      // System-managed fields must not be changed by client
+      // Prevent delete from client
+      allow delete: if false;
+
+      // =========================
+      // EVENTS CREATED BY HOST
+      // =========================
+      match /events/{eventId} {
+        // Hosts can read/write
+        allow read, write: if request.auth.uid == userId;
+
+        // Guests can read public event info
+        allow get: if request.auth == null || request.auth.uid != userId;
+
+        // =========================
+        // GUEST UPLOADS
+        // =========================
+        match /uploads/{uploadId} {
+          // Allow guests to create an upload
+          allow create: if true;
+
+          // Only the host can read/delete uploads
+          allow read, delete: if request.auth.uid == userId;
+
+          // Prevent overwrite of existing uploads
+          allow update: if false;
+        }
+
+        // =========================
+        // GUEST METADATA (e.g. name, session, etc.)
+        // =========================
+        match /guests/{guestId} {
+          // Guests can self-register (e.g. join via QR code)
+          allow create: if true;
+        }
+      }
+
+      // =========================
+      // PURCHASES (e.g. Stripe receipts or packages)
+      // =========================
+      match /purchases/{purchaseId} {
+        // Host can read their own purchase entries
+        allow read: if request.auth.uid == userId;
+      }
+    }
+
+    // =========================
+    // PUBLIC PACKAGES (read-only)
+    // =========================
+    match /packages/{packageId} {
+      allow read: if resource.data.availableToUsers == true;
+      allow write: if false;
+    }
+
+  }
+}
