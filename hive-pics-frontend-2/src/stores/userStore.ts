@@ -23,6 +23,16 @@ export const useUserStore = defineStore('user', () => {
   const userDisplayName = computed(() => user.value?.displayName || 'User');
   const userEmail = computed(() => user.value?.email);
   const userPhotoURL = computed(() => user.value?.photoURL);
+  const userInitials = computed(() => {
+    if (!user.value?.displayName) {
+      return '?';
+    }
+    return user.value?.displayName
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase();
+  });
 
   // --- ACTIONS --------------------------------------------------------------
 
@@ -97,6 +107,7 @@ export const useUserStore = defineStore('user', () => {
     userDisplayName,
     userEmail,
     userPhotoURL,
+    userInitials,
     init,
     login,
     logout,

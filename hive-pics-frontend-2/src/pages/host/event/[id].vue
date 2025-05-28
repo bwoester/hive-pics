@@ -1,5 +1,13 @@
+<route lang="yaml">
+meta:
+  layout: dashboard
+  requiresAuth: true
+</route>
+
 <template>
-  <EventForm :event="event" />
+  <v-container>
+    <EventForm :event="event" />
+  </v-container>
 </template>
 
 <script setup lang="ts">

@@ -1,10 +1,15 @@
+<route lang="yaml">
+meta:
+  layout: dashboard
+  requiresAuth: true
+</route>
+
 <template>
   <v-container>
     <!-- Header Section -->
     <v-row class="mb-6">
       <v-col cols="12">
         <h1 class="text-h3 font-weight-bold">Host Dashboard</h1>
-        <v-btn @click="logout">Logout</v-btn>
         <p class="text-subtitle-1">Manage your events and photo challenges</p>
       </v-col>
     </v-row>
@@ -31,7 +36,6 @@
     </v-row>
 
     <v-row v-if="!eventStore.isEmpty">
-
       <EventCard
         v-for="event in events"
         :key="event.id"
@@ -55,29 +59,8 @@
 </template>
 
 <script lang="ts" setup>
-  // can be defined as a global, see https://uvr.esm.is/guide/eslint.html#definepage
-  // eslint-disable-next-line no-undef
-  definePage({
-    // alias: ['/n/:name'],
-    meta: {
-      requiresAuth: true,
-    },
-  })
-
   import { useEventStore } from '@/stores/event.ts'
-  import { useRouter } from 'vue-router'
-  import { useUserStore } from '@/stores/userStore.ts'
 
   const eventStore = useEventStore()
   const { events } = storeToRefs(eventStore)
-
-  const userStore = useUserStore()
-  const router = useRouter()
-
-  async function logout (event: Event) {
-    await userStore.logout()
-    await router.push({ name: '/' })
-    event.preventDefault()
-  }
-
 </script>
