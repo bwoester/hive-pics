@@ -19,9 +19,9 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
-    '/host/': RouteRecordInfo<'/host/', '/host', Record<never, never>, Record<never, never>>,
-    '/host/event/[id]': RouteRecordInfo<'/host/event/[id]', '/host/event/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/host/event/create': RouteRecordInfo<'/host/event/create', '/host/event/create', Record<never, never>, Record<never, never>>,
-    '/Login': RouteRecordInfo<'/Login', '/Login', Record<never, never>, Record<never, never>>,
+    '/dashboard/': RouteRecordInfo<'/dashboard/', '/dashboard', Record<never, never>, Record<never, never>>,
+    '/dashboard/event/[id]': RouteRecordInfo<'/dashboard/event/[id]', '/dashboard/event/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/dashboard/event/create': RouteRecordInfo<'/dashboard/event/create', '/dashboard/event/create', Record<never, never>, Record<never, never>>,
+    '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
   }
 }

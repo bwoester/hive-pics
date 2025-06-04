@@ -1,13 +1,33 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue'
 import { auth } from '@/firebase';
-import { logoutUser } from '@/firebase/authService.ts';
+import { logoutUser, signInWithGoogle } from '@/firebase/authService.ts';
 import type { User } from 'firebase/auth';
+import { useRoute, useRouter } from 'vue-router';
 
-export const useUserStore = defineStore('user', () => {
+export const useAuthStore = defineStore('auth', () => {
+  const route = useRoute();
+  const router = useRouter();
 
-  auth.onAuthStateChanged(firebaseUser => {
+  auth.onAuthStateChanged(async firebaseUser => {
+    const wasLoggedIn = !!user.value;
+    const isNowLoggedIn = !!firebaseUser;
     user.value = firebaseUser;
+
+    // Detect automatic signouts
+    if (wasLoggedIn && !isNowLoggedIn && !isUserInitiatedLogout.value && route.meta.requiresAuth) {
+      // User was logged out automatically
+      error.value = 'You have been signed out. Please sign in again.';
+
+      // Could emit an event or call a callback here
+      await router.push({
+        name: '/login',
+        query: { redirect: route.fullPath },
+      });
+    }
+
+    // Reset the flag
+    isUserInitiatedLogout.value = false;
   });
 
   // --- STATE PROPERTIES -----------------------------------------------------
@@ -16,6 +36,7 @@ export const useUserStore = defineStore('user', () => {
   const isInitialized = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const isUserInitiatedLogout = ref(false);
 
   // --- GETTERS --------------------------------------------------------------
 
@@ -48,13 +69,13 @@ export const useUserStore = defineStore('user', () => {
     isInitialized.value = true;
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const login = async (authResult: any) => {
+  const login = async () => {
     isLoading.value = true;
     error.value = null;
 
     try {
-      user.value = authResult.user;
+      await signInWithGoogle();
+      // No need to set user.value as it will be handled by onAuthStateChanged
     } catch (err: unknown) {
       if (err instanceof Error) {
         error.value = err.message;
@@ -72,8 +93,10 @@ export const useUserStore = defineStore('user', () => {
     error.value = null;
 
     try {
+      // Set flag before logout
+      isUserInitiatedLogout.value = true;
       await logoutUser();
-      user.value = null;
+      // No need to set user.value = null as it will be handled by onAuthStateChanged
     } catch (err: unknown) {
       if (err instanceof Error) {
         error.value = err.message;

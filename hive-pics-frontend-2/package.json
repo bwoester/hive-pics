@@ -15,8 +15,8 @@
     "@fontsource/roboto": "5.2.5",
     "@mdi/font": "7.4.47",
     "firebase": "^11.8.1",
-    "firebaseui": "^6.1.0",
     "vue": "^3.5.13",
+    "vue-i18n": "^11.1.5",
     "vuetify": "^3.8.1"
   },
   "devDependencies": {
@@ -26,6 +26,7 @@
     "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.23.0",
     "eslint-config-vuetify": "^3.0.3",
+    "firebase-tools": "^14.6.0",
     "npm-run-all2": "^7.0.2",
     "pinia": "^3.0.1",
     "sass-embedded": "^1.86.3",

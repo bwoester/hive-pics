@@ -49,20 +49,20 @@
 </template>
 
 <script lang="ts" setup>
-  import { useUserStore } from '@/stores/userStore.ts';
+  import { useAuthStore } from '@/stores/authStore.ts';
   import { useRouter } from 'vue-router';
 
-  const userStore = useUserStore()
+  const authStore = useAuthStore()
   const router = useRouter()
 
-  const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(userStore);
+  const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore);
 
   function onMenuClick () {
   // Optional: trigger a sidebar menu
   }
 
   async function logout (event: Event) {
-    await userStore.logout()
+    await authStore.logout()
     await router.push({ name: '/' })
     event.preventDefault()
   }

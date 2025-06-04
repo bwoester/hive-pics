@@ -17,7 +17,7 @@
                 <p class="text-h6 mb-6">
                   A collaborative photo collection service for all your events
                 </p>
-                <v-btn class="mx-2" color="secondary" size="x-large" :to="`/host`">Get Started</v-btn>
+                <v-btn class="mx-2" color="secondary" size="x-large" :to="`/dashboard/`">Get Started</v-btn>
                 <v-btn class="mx-2" color="surface" size="x-large" variant="outlined">Learn More</v-btn>
               </v-col>
             </v-row>

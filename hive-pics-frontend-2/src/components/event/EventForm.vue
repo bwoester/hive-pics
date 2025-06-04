@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col cols="12">
-        <h1 class="text-h4 mb-4">{{ isNew ? 'Create New Event' : 'Update Event' }}</h1>
+        <h1 class="text-h4 mb-4">{{ props.isNew ? 'Create New Event' : 'Update Event' }}</h1>
       </v-col>
     </v-row>
 
@@ -30,54 +30,78 @@
             </v-col>
 
             <v-col cols="12" md="6">
-              <v-text-field
-                v-model="event.location"
-                label="Location"
-                required
-                :rules="[v => !!v || 'Location is required']"
-              />
-            </v-col>
-
-            <v-col cols="12" md="6">
-              <v-text-field
+              <v-date-input
                 v-model="event.date"
                 label="Event Date"
                 required
                 :rules="[v => !!v || 'Date is required']"
-                type="date"
               />
             </v-col>
 
             <v-col cols="12" md="6">
-              <v-text-field
-                v-model="event.capacity"
-                label="Capacity (optional)"
-                min="1"
-                type="number"
-              />
+              <div>
+                <label class="text-subtitle-1 mb-2 d-block">Event Cover Image</label>
+
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                  <v-btn
+                    prepend-icon="mdi-upload"
+                    variant="outlined"
+                    @click="triggerFileInput"
+                  >
+                    Upload Image
+                  </v-btn>
+
+                  <v-btn
+                    v-if="isCameraSupported"
+                    prepend-icon="mdi-camera"
+                    variant="outlined"
+                    @click="openCamera"
+                  >
+                    Take Photo
+                  </v-btn>
+                </div>
+
+                <!-- Hidden file input -->
+                <input
+                  ref="fileInput"
+                  accept="image/*"
+                  class="d-none"
+                  type="file"
+                  @change="handleFileUpload"
+                >
+
+                <!-- Image preview -->
+                <div v-if="imagePreview || event.coverImageUrl" class="mt-3">
+                  <v-img
+                    max-height="200"
+                    max-width="300"
+                    :src="imagePreview || event.coverImageUrl"
+                  />
+                  <div class="d-flex mt-2">
+                    <v-btn
+                      color="error"
+                      density="compact"
+                      icon="mdi-delete"
+                      variant="text"
+                      @click="removeImage"
+                    />
+                  </div>
+                </div>
+
+                <div v-if="isUploading" class="mt-3">
+                  <v-progress-linear indeterminate />
+                  <div class="text-caption">Uploading image...</div>
+                </div>
+              </div>
             </v-col>
 
-            <v-col cols="12" md="6">
-              <v-text-field
-                v-model="event.imageUrl"
-                label="Image URL (optional)"
-              />
-            </v-col>
-
-            <v-col cols="12">
-              <v-switch
-                v-model="event.isPublic"
-                color="primary"
-                label="Public Event"
-              />
-            </v-col>
           </v-row>
         </v-card-text>
 
         <v-card-actions>
           <v-spacer />
           <v-btn
-            :to="{ name: '/host/' }"
+            :to="{ name: '/dashboard/' }"
             variant="text"
           >
             Cancel
@@ -88,7 +112,7 @@
             :loading="eventStore.isLoading"
             type="submit"
           >
-            {{ isNew ? 'Create Event' : 'Update Event' }}
+            {{ props.isNew ? 'Create Event' : 'Update Event' }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -109,13 +133,25 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { type Event, useEventStore } from '@/stores/event.ts'
+  import { type Event, useEventStore } from '@/stores/eventStore.ts'
   import { useRouter } from 'vue-router'
+  import { storageService } from '@/firebase/storageService.ts'
+  import { useDeviceStore } from '@/stores/deviceStore'
+
 
   const router = useRouter()
+  const deviceStore = useDeviceStore()
   const eventStore = useEventStore()
   const form = ref(null)
   const isFormValid = ref(false)
+  const fileInput = ref<HTMLInputElement | null>(null)
+  const imagePreview = ref<string | null>(null)
+  const isUploading = ref(false)
+  const selectedFile = ref<File | null>(null)
+
+  onMounted(async () => {
+    await deviceStore.checkCameraSupport()
+  })
 
   const snackbar = ref({
     show: false,
@@ -124,13 +160,65 @@
   })
 
   const props = defineProps<{
+    isNew: boolean,
     event: Event
   }>()
 
   // Create a local copy to edit (to prevent direct mutation of prop)
   const event = reactive({ ...props.event })
 
-  const isNew = computed(() => event.id === undefined)
+  // Check if the device supports camera capture
+  const { isCameraSupported } = storeToRefs(deviceStore)
+
+  // Trigger the hidden file input
+  function triggerFileInput () {
+    if (fileInput.value) {
+      fileInput.value.click()
+    }
+  }
+
+  // Handle file selection from the file input
+  async function handleFileUpload (e: globalThis.Event) {
+    const target = e.target as HTMLInputElement
+    if (!target.files || target.files.length === 0) return
+
+    const file = target.files[0]
+    selectedFile.value = file
+
+    // Create a preview of the selected image
+    const reader = new FileReader()
+    reader.onload = e => {
+      imagePreview.value = e.target?.result as string
+    }
+    reader.readAsDataURL(file)
+
+    // Reset the file input so the same file can be selected again if needed
+    target.value = ''
+  }
+
+  // Open the camera for capturing a photo
+  function openCamera () {
+    // Create a file input that accepts camera input
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.capture = 'environment' // Use the back camera if available
+
+    // Handle the captured image
+    input.onchange = e => {
+      handleFileUpload(e)
+    }
+
+    // Trigger the camera
+    input.click()
+  }
+
+  // Remove the selected image
+  function removeImage () {
+    imagePreview.value = null
+    selectedFile.value = null
+    event.coverImageUrl = undefined
+  }
 
   function delay (ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -139,14 +227,52 @@
   async function saveEvent () {
     if (!isFormValid.value) return
 
-    const success = await eventStore.saveEvent(event)
-    if (success) {
-      showSuccess(isNew.value ? 'Event created successfully' : 'Event updated successfully')
-      // Wait a little while before redirecting
-      await delay(500)
-      await router.push({ name: '/host/' })
-    } else {
-      showError(eventStore.error || 'Failed to save event')
+    try {
+      // If there's a selected file, upload it to Firebase Storage
+      if (selectedFile.value) {
+        isUploading.value = true
+
+        try {
+          // Upload the image and get the download URL, update the event with the image URL
+          event.coverImageUrl = await storageService.uploadEventCoverImage(selectedFile.value, event.id)
+        } catch (error) {
+          console.error('Error uploading image:', error)
+          showError('Failed to upload image')
+          isUploading.value = false
+          return
+        } finally {
+          isUploading.value = false
+        }
+      } else {
+        isUploading.value = true
+
+        try {
+          // Delete potential old images, remove the image URL from the event
+          await storageService.deleteEventCoverImages(event.id)
+          delete event.coverImageUrl
+        } catch (error) {
+          console.error('Error deleting potential old images:', error)
+          showError('Failed to remove image')
+          isUploading.value = false
+          return
+        } finally {
+          isUploading.value = false
+        }
+      }
+
+      // Save the event with the updated image URL
+      const success = await eventStore.saveEvent(event)
+      if (success) {
+        showSuccess(props.isNew ? 'Event created successfully' : 'Event updated successfully')
+        // Wait a little while before redirecting
+        await delay(500)
+        await router.push({ name: '/dashboard/' })
+      } else {
+        showError(eventStore.error || 'Failed to save event')
+      }
+    } catch (error) {
+      console.error('Error saving event:', error)
+      showError('An unexpected error occurred')
     }
   }
 

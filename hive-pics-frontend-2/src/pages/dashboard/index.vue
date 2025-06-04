@@ -6,13 +6,6 @@ meta:
 
 <template>
   <v-container>
-    <!-- Header Section -->
-    <v-row class="mb-6">
-      <v-col cols="12">
-        <h1 class="text-h3 font-weight-bold">Host Dashboard</h1>
-        <p class="text-subtitle-1">Manage your events and photo challenges</p>
-      </v-col>
-    </v-row>
 
     <!-- Create New Event Button -->
     <v-row v-if="!eventStore.isEmpty" class="mb-6">
@@ -21,7 +14,7 @@ meta:
           color="primary"
           prepend-icon="mdi-plus"
           size="large"
-          :to="{ name: '/host/event/create' }"
+          :to="{ name: '/dashboard/event/create' }"
         >
           Create New Event
         </v-btn>
@@ -31,7 +24,7 @@ meta:
     <!-- Events List -->
     <v-row>
       <v-col cols="12">
-        <h2 class="text-h4 mb-4">Your Events</h2>
+        <h2 class="text-h4 mb-4">Your Events and Photo Challenges</h2>
       </v-col>
     </v-row>
 
@@ -50,7 +43,7 @@ meta:
           <v-icon class="mb-4" color="grey-lighten-1" size="x-large">mdi-calendar-blank</v-icon>
           <h3 class="text-h5 mb-2">No Events Yet</h3>
           <p class="mb-4">You haven't created any events yet. Get started by creating your first event!</p>
-          <v-btn color="primary" prepend-icon="mdi-plus" :to="{ name: '/host/event/create' }">Create Your First Event
+          <v-btn color="primary" prepend-icon="mdi-plus" :to="{ name: '/dashboard/event/create' }">Create Your First Event
           </v-btn>
         </v-sheet>
       </v-col>
@@ -59,7 +52,7 @@ meta:
 </template>
 
 <script lang="ts" setup>
-  import { useEventStore } from '@/stores/event.ts'
+  import { useEventStore } from '@/stores/eventStore.ts'
 
   const eventStore = useEventStore()
   const { events } = storeToRefs(eventStore)

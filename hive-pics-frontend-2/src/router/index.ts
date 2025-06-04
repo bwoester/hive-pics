@@ -8,7 +8,7 @@
 import { createRouter, createWebHistory } from 'vue-router/auto'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
-import { useUserStore } from '@/stores/userStore.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,28 +17,33 @@ const router = createRouter({
 
 // Navigation guard
 router.beforeEach(async (to, from, next) => {
-  const userStore = useUserStore()
-  const { isInitialized, isLoggedIn, userDisplayName } = storeToRefs(userStore);
+  const authStore = useAuthStore()
+  const { isInitialized, isLoggedIn } = storeToRefs(authStore);
 
   if (!isInitialized.value) {
     // Wait for Firebase to resolve the user session
-    await userStore.init();
+    await authStore.init();
   }
 
-  if (to.meta.requiresAuth) {
-    console.log(`route ${to.name} requires auth`)
-  } else {
-    console.log(`route ${to.name} is public`)
-  }
-
-  if (isLoggedIn.value) {
-    console.log(`user logged in as '${userDisplayName.value}'`)
-  } else {
-    console.log('user not logged in')
-  }
+  // const { userDisplayName } = storeToRefs(authStore);
+  //
+  // if (to.meta.requiresAuth) {
+  //   console.log(`route ${to.name} requires auth`)
+  // } else {
+  //   console.log(`route ${to.name} is public`)
+  // }
+  //
+  // if (isLoggedIn.value) {
+  //   console.log(`user logged in as '${userDisplayName.value}'`)
+  // } else {
+  //   console.log('user not logged in')
+  // }
 
   if (to.meta.requiresAuth && !isLoggedIn.value) {
-    next({ name: '/Login' })
+    next({
+      name: '/login',
+      query: { redirect: to.fullPath },
+    })
   } else {
     next()
   }
