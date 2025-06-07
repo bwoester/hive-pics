@@ -29,6 +29,32 @@
               />
             </v-col>
 
+            <v-col cols="12">
+              <v-select
+                v-model="event.challengeSetId"
+                clearable
+                item-title="name"
+                item-value="id"
+                :items="challengeStore.challengeSets"
+                label="Challenge Set"
+                @update:model-value="onChallengeSetChange"
+              />
+            </v-col>
+
+            <v-col v-if="selectedChallenges.length > 0" cols="12">
+              <v-card variant="outlined">
+                <v-card-title>Challenges in this set</v-card-title>
+                <v-card-text>
+                  <v-list>
+                    <v-list-item v-for="challenge in selectedChallenges" :key="challenge.id">
+                      <v-list-item-title>{{ challenge.title }}</v-list-item-title>
+                      <v-list-item-subtitle>{{ challenge.description }}</v-list-item-subtitle>
+                    </v-list-item>
+                  </v-list>
+                </v-card-text>
+              </v-card>
+            </v-col>
+
             <v-col cols="12" md="6">
               <v-date-input
                 v-model="event.date"
@@ -137,21 +163,31 @@
   import { useRouter } from 'vue-router'
   import { storageService } from '@/firebase/storageService.ts'
   import { useDeviceStore } from '@/stores/deviceStore'
+  import { useChallengeStore } from '@/stores/challengeStore.ts'
 
 
   const router = useRouter()
   const deviceStore = useDeviceStore()
   const eventStore = useEventStore()
+  const challengeStore = useChallengeStore()
   const form = ref(null)
   const isFormValid = ref(false)
   const fileInput = ref<HTMLInputElement | null>(null)
   const imagePreview = ref<string | null>(null)
   const isUploading = ref(false)
   const selectedFile = ref<File | null>(null)
+  const selectedChallenges = computed(() => {
+    if (!event.challengeSetId) return []
+    return challengeStore.getChallengesInSet(event.challengeSetId)
+  })
 
   onMounted(async () => {
     await deviceStore.checkCameraSupport()
   })
+
+  function onChallengeSetChange (setId: string) {
+    event.challengeSetId = setId
+  }
 
   const snackbar = ref({
     show: false,

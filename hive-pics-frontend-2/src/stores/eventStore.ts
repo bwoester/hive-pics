@@ -11,6 +11,7 @@ export interface Event {
   coverImageUrl?: string;
   description: string;
   date: Date;
+  challengeSetId?: string;
   quota: {
     maxGuests: number;
     maxUploads: number;
