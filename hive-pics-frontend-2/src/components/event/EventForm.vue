@@ -36,7 +36,7 @@
                 item-title="name"
                 item-value="id"
                 :items="challengeStore.challengeSets"
-                label="Challenge Set"
+                label="Choose a challenge theme for your event"
                 @update:model-value="onChallengeSetChange"
               />
             </v-col>

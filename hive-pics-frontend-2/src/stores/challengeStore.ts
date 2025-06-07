@@ -153,6 +153,82 @@ export const useChallengeStore = defineStore('challenge', () => {
         description: 'Capture a genuine candid moment.',
         reward: 15,
         tags: ['candid', 'emotional'],
+      },{
+        id: '8',
+        title: 'Candid Moment',
+        description: 'Capture a genuine candid moment.',
+        reward: 15,
+        tags: ['candid', 'emotional'],
+      },
+      {
+        id: '9',
+        title: 'Das generationsübergreifende Bild',
+        description: 'Findet die Person mit dem jüngsten und die mit dem ältesten Geburtsjahr auf der Feier und macht ein gemeinsames Foto von ihnen.',
+        reward: 25,
+        tags: ['family', 'generations', 'social', 'unique'],
+      },
+      {
+        id: '10',
+        title: 'Detail-Detektiv',
+        description: 'Fotografiert das kleinste oder unscheinbarste Detail, das euch an der Dekoration oder den Geschenken auffällt.',
+        reward: 15,
+        tags: ['detail', 'creative', 'decoration'],
+      },
+      {
+        id: '11',
+        title: 'Die lachendste Gruppe',
+        description: 'Sammelt mindestens fünf Leute und fangt ihren ehrlichsten und herzlichsten Lacher in einem Gruppenfoto ein.',
+        reward: 20,
+        tags: ['fun', 'social', 'emotion', 'group'],
+      },
+      {
+        id: '12',
+        title: 'Kulinarische Kunst',
+        description: 'Macht ein appetitliches Foto vom Buffet oder von einem besonders schön angerichteten Teller.',
+        reward: 10,
+        tags: ['food', 'aesthetic', 'detail'],
+      },
+      {
+        id: '13',
+        title: 'Kinder-Chaos',
+        description: 'Fangt einen lustigen oder herzerwärmenden Moment der Kinder beim Spielen oder Toben ein.',
+        reward: 15,
+        tags: ['children', 'fun', 'candid', 'family'],
+      },
+      {
+        id: '14',
+        title: 'Emotionale Momentaufnahme',
+        description: 'Fotografiert einen Moment, der eine besondere Emotion (Freude, Rührung, Überraschung) einfängt – vielleicht eine Umarmung, ein Blick oder eine Geste.',
+        reward: 20,
+        tags: ['emotion', 'candid', 'heartfelt'],
+      },
+      {
+        id: '15',
+        title: 'Socken-Selfie',
+        description: 'Alle Anwesenden, die mitmachen, stellen ihre Füße mit Socken in den Vordergrund und machen ein Selfie davon. Eine lustige Erinnerung!',
+        reward: 10,
+        tags: ['fun', 'selfie', 'creative', 'humor'],
+      },
+      {
+        id: '16',
+        title: 'Der Gruppen-Spiegel',
+        description: 'Bildet eine Gruppe und macht ein Foto von euch, das sich in einem Spiegel, einer Scheibe oder einer anderen reflektierenden Oberfläche spiegelt.',
+        reward: 15,
+        tags: ['group', 'creative', 'perspective'],
+      },
+      {
+        id: '17',
+        title: 'Das "Ich-bin-dabei"-Selfie',
+        description: 'Jede:r, der:die mitmacht, macht ein Selfie mit einem besonderen Gegenstand oder einer Person, die für die Tauffeier symbolisch ist (z.B. Taufkerze, Taufkleid, ein besonders dekoriertes Detail).',
+        reward: 15,
+        tags: ['selfie', 'symbolic', 'personal'],
+      },
+      {
+        id: '18',
+        title: 'Taufpate/Taufpatin-Porträt',
+        description: 'Macht ein besonderes und individuelles Porträt vom Taufpaten oder der Taufpatin, das seine/ihre Persönlichkeit widerspiegelt.',
+        reward: 20,
+        tags: ['portrait', 'family', 'important person'],
       },
     ]
 
@@ -175,6 +251,23 @@ export const useChallengeStore = defineStore('challenge', () => {
         name: 'Corporate Event',
         description: 'Professional photo challenges for business events.',
         challengeIds: ['2', '5', '8'],
+      },
+      {
+        id: '4',
+        name: 'Taufe',
+        description: 'Besondere Foto-Challenges, um die Taufe deines Kindes festzuhalten.',
+        challengeIds: [
+          '9', // Das generationsübergreifende Bild
+          '10', // Detail-Detektiv
+          '11', // Die lachendste Gruppe
+          '12', // Kulinarische Kunst
+          '13', // Kinder-Chaos
+          '14', // Emotionale Momentaufnahme
+          '15', // Socken-Selfie
+          '16', // Der Gruppen-Spiegel
+          '17', // Das "Ich-bin-dabei"-Selfie
+          '18', // Taufpate/Taufpatin-Porträt
+        ],
       },
     ]
 
