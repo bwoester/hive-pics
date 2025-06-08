@@ -1,18 +1,18 @@
 <template>
   <v-app-bar color="primary">
-    <!-- Logo on the left -->
-    <v-app-bar-nav-icon class="d-sm-none" @click="onMenuClick" />
-    <v-img
-      alt="Logo"
-      class="mr-2 d-none d-sm-inline"
-      max-height="32"
-      max-width="32"
-      src="@/assets/logo.png"
-    />
-    <v-toolbar-title class="text-truncate">Dashboard</v-toolbar-title>
 
-    <!-- Spacer pushes user info to the right -->
-    <v-spacer />
+    <!-- Logo and AppName as link to landing page -->
+    <template #prepend>
+      <router-link class="mr-4 text-white logo" to="/">
+        <img
+          alt="Logo"
+          src="@/assets/logo-no-text.png"
+        >
+        <span class="ml-2"><b>Hive</b> Pics</span>
+      </router-link>
+    </template>
+
+    <v-toolbar-title class="d-none d-md-flex text-truncate">Dashboard</v-toolbar-title>
 
     <!-- User Info and Logout -->
     <v-menu offset-y>
@@ -57,14 +57,20 @@
 
   const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore);
 
-  function onMenuClick () {
-  // Optional: trigger a sidebar menu
-  }
-
   async function logout (event: Event) {
     await authStore.logout()
     await router.push({ name: '/' })
     event.preventDefault()
   }
-
 </script>
+
+<style scoped lang="sass">
+a.logo
+  text-decoration: none
+  display: flex
+  align-items: center
+  img
+    width: 40px
+    height: 40px
+    object-fit: contain
+</style>

@@ -2,9 +2,6 @@
   <v-app-bar color="primary">
 
     <!-- Logo and AppName as link to landing page -->
-    <!--
-    TODO add @click="scrollToSection('features')" if already on landing page
-    -->
     <template #prepend>
       <router-link class="mr-4 text-white" to="/" @click="handleLogoClick">
         <img
