@@ -7,12 +7,6 @@
           <v-container>
             <v-row align="center" justify="center">
               <v-col class="text-center" cols="12" md="6">
-                <v-img
-                  alt="Hive Pics Logo"
-                  class="mx-auto mb-4"
-                  src="@/assets/logo.png"
-                  width="150"
-                />
                 <h1 class="text-h2 font-weight-bold mb-4">Hive Pics</h1>
                 <p class="text-h6 mb-6">
                   A collaborative photo collection service for all your events
@@ -27,7 +21,7 @@
     </v-row>
 
     <!-- How It Works -->
-    <v-container class="py-12">
+    <v-container id="how-it-works" class="py-12">
       <v-row>
         <v-col class="text-center mb-8" cols="12">
           <h2 class="text-h4 font-weight-bold">How It Works</h2>
@@ -82,7 +76,7 @@
     </v-container>
 
     <!-- Features -->
-    <v-sheet class="py-12" color="grey-lighten-4">
+    <v-sheet id="features" class="py-12" color="grey-lighten-4">
       <v-container>
         <v-row>
           <v-col class="text-center mb-8" cols="12">
@@ -180,7 +174,7 @@
     </v-sheet>
 
     <!-- Subscription Plans -->
-    <v-container class="py-12">
+    <v-container id="pricing" class="py-12">
       <v-row>
         <v-col class="text-center mb-8" cols="12">
           <h2 class="text-h4 font-weight-bold">Subscription Plans</h2>
@@ -290,6 +284,11 @@
     </v-sheet>
   </v-container>
 </template>
+
+<route lang="yaml">
+meta:
+  layout: landing
+</route>
 
 <script lang="ts" setup>
   //
