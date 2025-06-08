@@ -6,7 +6,7 @@
     TODO add @click="scrollToSection('features')" if already on landing page
     -->
     <template #prepend>
-      <router-link class="mr-4 text-white" to="/">
+      <router-link class="mr-4 text-white" to="/" @click="handleLogoClick">
         <img
           alt="Logo"
           class="logo"
@@ -38,7 +38,20 @@
 </template>
 
 <script setup lang="ts">
-  /* none */
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute()
+
+  const handleLogoClick = (event: Event) => {
+    // Check if we're already on the landing page
+    if (route.path === '/') {
+      event.preventDefault()
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
+  }
 </script>
 
 <style scoped lang="sass">
