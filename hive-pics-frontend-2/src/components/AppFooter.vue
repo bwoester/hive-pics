@@ -1,7 +1,7 @@
 <template>
-  <v-footer app class="d-flex align-center justify-center ga-2 flex-wrap flex-grow-1 py-3">
+  <v-footer class="d-flex align-center justify-center ga-2 flex-wrap flex-grow-0 py-3">
 
-    <div>
+    <div class="text-caption">
       <router-link
         class="mx-2 footer-link text-decoration-none"
         to="/legalNotice"
