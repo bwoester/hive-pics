@@ -1,5 +1,5 @@
 <template>
-  <v-container class="legal-notice-container">
+  <v-container>
     <v-row justify="center">
       <v-col cols="12" lg="6" md="8" sm="10">
         <v-card class="pa-6 mt-4">
