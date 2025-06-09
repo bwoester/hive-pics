@@ -4,23 +4,8 @@ import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore.ts';
 import type { Unsubscribe } from 'firebase/firestore';
 import { eventService } from '@/firebase/eventService.ts';
+import type { Event } from '@shared/event.ts';
 
-export interface Event {
-  id: string;
-  title: string;
-  coverImageUrl?: string;
-  description: string;
-  date: Date;
-  challengeSetId?: string;
-  quota: {
-    maxGuests: number;
-    maxUploads: number;
-    retentionDays: number;
-  };
-  settings: {
-    isDownloadAllowed: boolean;
-  };
-}
 
 export const useEventStore = defineStore('event', () => {
 

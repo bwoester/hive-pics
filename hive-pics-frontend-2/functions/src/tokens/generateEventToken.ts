@@ -2,49 +2,11 @@ import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https
 import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
 import { GuestToken } from '@shared/guestToken'
+import basex from 'base-x';
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
   admin.initializeApp();
-}
-
-/**
- * Converts a Buffer to a base62 encoded string
- * Base62 uses characters 0-9, a-z, A-Z (total of 62 characters)
- * @param buffer - The buffer to encode
- * @param length - The desired length of the output string
- * @returns A base62 encoded string
- */
-function base62Encode (buffer: Buffer, length: number): string {
-  const charset = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const base = charset.length;
-  let result = '';
-
-  // Convert buffer to a large integer
-  let num = 0n;
-  for (const byte of buffer) {
-    num = (num << 8n) | BigInt(byte);
-  }
-
-  // Convert the integer to base62
-  while (num > 0n) {
-    const remainder = Number(num % BigInt(base));
-    result = charset[remainder] + result;
-    num = num / BigInt(base);
-  }
-
-  // Pad with random characters if needed
-  while (result.length < length) {
-    const randomIndex = Math.floor(Math.random() * base);
-    result = charset[randomIndex] + result;
-  }
-
-  // Truncate if too long
-  if (result.length > length) {
-    result = result.substring(result.length - length);
-  }
-
-  return result;
 }
 
 /**
@@ -58,8 +20,6 @@ interface OutputData {
   success: boolean;
   message: string;
   eventId: string;
-  token: string;
-  expiresAt: number;
 }
 
 /**
@@ -67,10 +27,11 @@ interface OutputData {
  *
  * This Firebase callable function creates a unique token associated with an event ID.
  * The token is generated using cryptographically secure methods and stored in Firestore
- * with a timestamp for when it was issued.
+ * with a timestamp for when it was issued. The token is also directly updated in the event document.
+ * Tokens do not expire automatically.
  *
  * @param request - CallableRequest containing the eventId in the data property and auth information
- * @returns Object containing the generated token
+ * @returns Object containing success status, message, and eventId
  * @throws HttpsError if the user is not authenticated or if eventId is invalid
  */
 export const generateEventToken = onCall<InputData, Promise<OutputData>>(async (request: CallableRequest<InputData>) => {
@@ -105,22 +66,35 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(async (
     );
   }
 
-  // Generate a secure random token using base62 encoding
+  // Generate a secure random token using basex for base62 encoding
   // 20 characters in base62 provides ~119 bits of entropy
   const TOKEN_LENGTH = 20;
-  const randomBytes = crypto.randomBytes(16); // 16 bytes = 128 bits
-  const token = base62Encode(randomBytes, TOKEN_LENGTH);
+  const randomBytes: Buffer<ArrayBufferLike> = crypto.randomBytes(16); // 16 bytes = 128 bits
 
-  // Calculate expiration time (30 days from now)
-  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-  const issuedAt = Date.now();
-  const expiresAt = issuedAt + THIRTY_DAYS_MS;
+  // Encode the random bytes using base62 alphabet with basex
+  const BASE62_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const base62 = basex(BASE62_ALPHABET)
+  let token = base62.encode(Buffer.from(randomBytes));
+
+  // Ensure the token is the correct length
+  while (token.length < TOKEN_LENGTH) {
+    const randomNum = Math.floor(Math.random() * 62);
+    token = BASE62_ALPHABET[randomNum] + token;
+  }
+
+  // Truncate if too long
+  if (token.length > TOKEN_LENGTH) {
+    token = token.substring(token.length - TOKEN_LENGTH);
+  }
+
+  // Record the current timestamp
+  const createdAt = new Date();
 
   // Create the guest token object
   const guestToken: GuestToken = {
     token,
     eventId,
-    issuedAt,
+    createdAt,
   };
 
   // Store the token in Firestore
@@ -130,15 +104,17 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(async (
     .set({
       guestToken,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      expiresAt,
     });
 
-  // Return a meaningful response with all relevant information
+  // Update the event document with the token
+  await eventRef.update({
+    token,
+  });
+
+  // Return a meaningful response without the token
   return {
     success: true,
     message: 'Event token generated successfully',
     eventId,
-    token,
-    expiresAt,
   };
 });
