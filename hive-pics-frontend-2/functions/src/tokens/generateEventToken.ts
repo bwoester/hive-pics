@@ -3,7 +3,49 @@ import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
 import { GuestToken } from '@shared/guestToken'
 
-admin.initializeApp();
+// Initialize Firebase Admin if not already initialized
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+/**
+ * Converts a Buffer to a base62 encoded string
+ * Base62 uses characters 0-9, a-z, A-Z (total of 62 characters)
+ * @param buffer - The buffer to encode
+ * @param length - The desired length of the output string
+ * @returns A base62 encoded string
+ */
+function base62Encode (buffer: Buffer, length: number): string {
+  const charset = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const base = charset.length;
+  let result = '';
+
+  // Convert buffer to a large integer
+  let num = 0n;
+  for (const byte of buffer) {
+    num = (num << 8n) | BigInt(byte);
+  }
+
+  // Convert the integer to base62
+  while (num > 0n) {
+    const remainder = Number(num % BigInt(base));
+    result = charset[remainder] + result;
+    num = num / BigInt(base);
+  }
+
+  // Pad with random characters if needed
+  while (result.length < length) {
+    const randomIndex = Math.floor(Math.random() * base);
+    result = charset[randomIndex] + result;
+  }
+
+  // Truncate if too long
+  if (result.length > length) {
+    result = result.substring(result.length - length);
+  }
+
+  return result;
+}
 
 /**
  * Interface for the data required to generate an event token
@@ -13,9 +55,11 @@ interface InputData {
 }
 
 interface OutputData {
+  success: boolean;
   message: string;
-  userId: string;
   eventId: string;
+  token: string;
+  expiresAt: number;
 }
 
 /**
@@ -43,9 +87,6 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(async (
   // Extract and validate eventId
   const { eventId } = request.data;
 
-  // TODO verify the event exists and belongs to the user
-  //  firestore location: users/${userId}/events/${eventId}
-
   if (!eventId || eventId.trim() === '') {
     throw new HttpsError(
       'invalid-argument',
@@ -53,16 +94,33 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(async (
     );
   }
 
-  // TODO change to 20-char wide, base62 encoded string. Should be ~119 bits of entropy
-  // Generate a secure random token using crypto
-  // Using 32 bytes (256 bits) of randomness encoded as a hex string
-  const token = crypto.randomBytes(32).toString('hex');
+  // Verify the event exists and belongs to the user
+  const eventRef = admin.firestore().doc(`users/${userId}/events/${eventId}`);
+  const eventDoc = await eventRef.get();
+
+  if (!eventDoc.exists) {
+    throw new HttpsError(
+      'not-found',
+      'Event not found or you do not have permission to access it.'
+    );
+  }
+
+  // Generate a secure random token using base62 encoding
+  // 20 characters in base62 provides ~119 bits of entropy
+  const TOKEN_LENGTH = 20;
+  const randomBytes = crypto.randomBytes(16); // 16 bytes = 128 bits
+  const token = base62Encode(randomBytes, TOKEN_LENGTH);
+
+  // Calculate expiration time (30 days from now)
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const issuedAt = Date.now();
+  const expiresAt = issuedAt + THIRTY_DAYS_MS;
 
   // Create the guest token object
   const guestToken: GuestToken = {
     token,
     eventId,
-    issuedAt: Date.now(),
+    issuedAt,
   };
 
   // Store the token in Firestore
@@ -72,16 +130,15 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(async (
     .set({
       guestToken,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt,
     });
 
-  // TODO unsure about meaningful response.
-  //  - success/ failure
-  //  - eventId
-  //  - token, to associate the event with it
-  //  - anything else?
+  // Return a meaningful response with all relevant information
   return {
-    message: 'Event accessed successfully',
-    userId,
+    success: true,
+    message: 'Event token generated successfully',
     eventId,
+    token,
+    expiresAt,
   };
 });
