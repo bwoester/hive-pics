@@ -6,6 +6,8 @@ import type { Unsubscribe } from 'firebase/firestore';
 import { eventService } from '@/firebase/eventService.ts';
 import type { Event } from '@shared/event.ts';
 
+// TODO not sure yet where to store types in the long run
+export type { Event } from '@shared/event.ts'
 
 export const useEventStore = defineStore('event', () => {
 
