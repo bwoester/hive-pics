@@ -10,5 +10,5 @@
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
 
-import { generateEventToken } from './tokens/generateEventToken';
+import { generateEventToken } from './tokens/generateEventToken.js';
 export { generateEventToken };

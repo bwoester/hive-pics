@@ -1,7 +1,7 @@
 import { CallableRequest, HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
 import * as crypto from 'crypto';
-import { GuestToken } from '@shared/guestToken.js'
+import { GuestToken } from '../../../shared/guestToken.js'
 import basex from 'base-x';
 
 // Initialize Firebase Admin if not already initialized
