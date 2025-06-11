@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { type Challenge, type ChallengeSet, useChallengeStore } from './challengeStore'
 
 describe('Challenge Store', () => {
@@ -60,9 +60,9 @@ describe('Challenge Store', () => {
       const challenges = store.getChallengesByTag('fun')
 
       expect(challenges.length).toBeGreaterThan(0)
-      challenges.forEach(challenge => {
+      for (const challenge of challenges) {
         expect(challenge.tags).toContain('fun')
-      })
+      }
     })
 
     it('should get challenges in a set', () => {
@@ -76,9 +76,9 @@ describe('Challenge Store', () => {
       expect(set).not.toBeNull()
 
       // Check that all challenges in the result are in the set's challengeIds
-      challenges.forEach(challenge => {
+      for (const challenge of challenges) {
         expect(set?.challengeIds).toContain(challenge.id)
-      })
+      }
     })
 
     it('should return empty array for non-existent set id', () => {

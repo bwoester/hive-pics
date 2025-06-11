@@ -13,7 +13,6 @@
       <v-card-actions>
         <router-link :to="{ name: '/dashboard/' }" />
 
-
         <v-btn color="primary" prepend-icon="mdi-pencil" :to="`/dashboard/event/${event.id}`" variant="text">Edit</v-btn>
         <v-btn color="primary" prepend-icon="mdi-eye" variant="text">View Event</v-btn>
         <v-spacer />

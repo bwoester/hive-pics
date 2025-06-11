@@ -1,4 +1,5 @@
-import { db } from '@/firebase'
+import type { Unsubscribe } from 'firebase/firestore'
+import type { Event } from '@/stores/eventStore'
 import {
   collection,
   deleteDoc,
@@ -7,8 +8,7 @@ import {
   query,
   setDoc,
 } from 'firebase/firestore'
-import type { Unsubscribe } from 'firebase/firestore'
-import type { Event } from '@/stores/eventStore'
+import { db } from '@/firebase'
 
 export const eventService = {
   /**
@@ -18,14 +18,16 @@ export const eventService = {
    * @returns Unsubscribe function
    */
   subscribeToEvents (userId: string, onEventsUpdate: (events: Event[]) => void): Unsubscribe {
-    if (!userId) throw new Error('User ID is required')
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
 
     const eventsCollection = collection(db, `users/${userId}/events`)
     const q = query(eventsCollection)
 
     return onSnapshot(q, snapshot => {
       const events = snapshot.docs.map(doc => {
-        const data = doc.data();
+        const data = doc.data()
         return {
           ...data,
           date: data.date?.toDate(), // Convert Timestamp to Date
@@ -37,7 +39,9 @@ export const eventService = {
   },
 
   createNewEvent (userId: string): Event {
-    if (!userId) throw new Error('User ID is required')
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
 
     const eventRef = doc(collection(db, `users/${userId}/events`))
     const eventId: string = eventRef.id
@@ -66,7 +70,9 @@ export const eventService = {
    * @returns The saved event with its ID
    */
   async saveEvent (userId: string, event: Event): Promise<Event> {
-    if (!userId) throw new Error('User ID is required')
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
 
     const eventsCollection = collection(db, `users/${userId}/events`)
 
@@ -95,7 +101,9 @@ export const eventService = {
    * @param eventId - The ID of the event to delete
    */
   async deleteEvent (userId: string, eventId: string): Promise<void> {
-    if (!userId || !eventId) throw new Error('User ID and Event ID are required')
+    if (!userId || !eventId) {
+      throw new Error('User ID and Event ID are required')
+    }
 
     const eventDoc = doc(db, `users/${userId}/events/${eventId}`)
     await deleteDoc(eventDoc)

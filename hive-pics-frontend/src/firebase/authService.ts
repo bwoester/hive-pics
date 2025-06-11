@@ -1,9 +1,9 @@
-import { auth } from '@/firebase';
-import type { UserCredential } from 'firebase/auth';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import type { UserCredential } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { auth } from '@/firebase'
 
 export async function logoutUser (): Promise<void> {
-  return auth.signOut();
+  return auth.signOut()
 }
 
 /**
@@ -11,6 +11,6 @@ export async function logoutUser (): Promise<void> {
  * @returns Promise with the auth result
  */
 export async function signInWithGoogle (): Promise<UserCredential> {
-  const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+  const provider = new GoogleAuthProvider()
+  return signInWithPopup(auth, provider)
 }

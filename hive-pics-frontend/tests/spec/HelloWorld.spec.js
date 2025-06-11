@@ -1,10 +1,10 @@
 import { mount } from '@vue/test-utils'
+import ResizeObserver from 'resize-observer-polyfill'
 import { expect, test } from 'vitest'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import HelloWorld from '../../src/components/HelloWorld.vue'
-import ResizeObserver from 'resize-observer-polyfill'
 
 const vuetify = createVuetify({
   components,

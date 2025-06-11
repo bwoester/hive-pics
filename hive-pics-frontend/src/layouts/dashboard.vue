@@ -51,13 +51,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { useAuthStore } from '@/stores/authStore.ts';
-  import { useRouter } from 'vue-router';
+  import { useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/authStore.ts'
 
   const authStore = useAuthStore()
   const router = useRouter()
 
-  const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore);
+  const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore)
 
   async function logout (event: Event) {
     await authStore.logout()

@@ -6,7 +6,9 @@ export const useDeviceStore = defineStore('device', () => {
   const isInitialized = ref(false)
 
   async function checkCameraSupport () {
-    if (isInitialized.value) return isCameraSupported.value
+    if (isInitialized.value) {
+      return isCameraSupported.value
+    }
 
     if (!('mediaDevices' in navigator && 'enumerateDevices' in navigator.mediaDevices)) {
       isInitialized.value = true
@@ -16,8 +18,8 @@ export const useDeviceStore = defineStore('device', () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices()
       isCameraSupported.value = devices.some(device => device.kind === 'videoinput')
-    } catch (err) {
-      console.error('Error checking camera support:', err)
+    } catch (error) {
+      console.error('Error checking camera support:', error)
       isCameraSupported.value = false
     }
 

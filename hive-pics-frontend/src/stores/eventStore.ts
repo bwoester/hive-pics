@@ -1,16 +1,15 @@
+import type { Unsubscribe } from 'firebase/firestore'
+import type { Event } from '../../../shared/event.ts'
 // Utilities
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAuthStore } from '@/stores/authStore.ts';
-import type { Unsubscribe } from 'firebase/firestore';
-import { eventService } from '@/firebase/eventService.ts';
-import type { Event } from '../../../shared/event.ts';
+import { eventService } from '@/firebase/eventService.ts'
+import { useAuthStore } from '@/stores/authStore.ts'
 
 // TODO not sure yet where to store types in the long run
 export type { Event } from '../../../shared/event.ts'
 
 export const useEventStore = defineStore('event', () => {
-
   const currentEvent = ref<Event | null>(null)
   const events = ref<Event[]>([])
   const isLoading = ref(false)
@@ -50,11 +49,11 @@ export const useEventStore = defineStore('event', () => {
         updatedEvents => {
           events.value = updatedEvents
           isLoading.value = false
-        }
+        },
       )
-    } catch (err) {
+    } catch (error_) {
       error.value = 'Failed to subscribe to events'
-      console.error(err)
+      console.error(error_)
       isLoading.value = false
     }
   }
@@ -76,9 +75,9 @@ export const useEventStore = defineStore('event', () => {
     error.value = null
     try {
       return eventService.createNewEvent(authStore.user.uid)
-    } catch (err) {
+    } catch (error_) {
       error.value = 'Failed to create new event'
-      console.error(err)
+      console.error(error_)
       return null
     } finally {
       isLoading.value = false
@@ -96,9 +95,9 @@ export const useEventStore = defineStore('event', () => {
     try {
       await eventService.saveEvent(authStore.user.uid, event)
       return true
-    } catch (err) {
+    } catch (error_) {
       error.value = 'Failed to save event'
-      console.error(err)
+      console.error(error_)
       return false
     } finally {
       isLoading.value = false
@@ -116,9 +115,9 @@ export const useEventStore = defineStore('event', () => {
     try {
       await eventService.deleteEvent(authStore.user.uid, id)
       return true
-    } catch (err) {
+    } catch (error_) {
       error.value = 'Failed to delete event'
-      console.error(err)
+      console.error(error_)
       return false
     } finally {
       isLoading.value = false
@@ -133,7 +132,7 @@ export const useEventStore = defineStore('event', () => {
     } else {
       unsubscribeFromEvents()
     }
-  });
+  })
 
   return {
     currentEvent,

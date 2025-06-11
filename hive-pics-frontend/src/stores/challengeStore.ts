@@ -4,19 +4,19 @@ import { computed, ref } from 'vue'
 
 // Define the Challenge interface
 export interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  reward: number;
-  tags: string[];
+  id: string
+  title: string
+  description: string
+  reward: number
+  tags: string[]
 }
 
 // Define the ChallengeSet interface
 export interface ChallengeSet {
-  id: string;
-  name: string;
-  description: string;
-  challengeIds: string[];
+  id: string
+  name: string
+  description: string
+  challengeIds: string[]
 }
 
 export const useChallengeStore = defineStore('challenge', () => {
@@ -41,7 +41,9 @@ export const useChallengeStore = defineStore('challenge', () => {
 
   const getChallengesInSet = computed(() => (setId: string) => {
     const set = getChallengeSetById.value(setId)
-    if (!set) return []
+    if (!set) {
+      return []
+    }
     return set.challengeIds.map(id => getChallengeById.value(id)).filter(Boolean) as Challenge[]
   })
 
@@ -60,9 +62,9 @@ export const useChallengeStore = defineStore('challenge', () => {
   function removeChallenge (id: string) {
     challenges.value = challenges.value.filter(challenge => challenge.id !== id)
     // Also remove this challenge from any sets that contain it
-    challengeSets.value.forEach(set => {
+    for (const set of challengeSets.value) {
       set.challengeIds = set.challengeIds.filter(challengeId => challengeId !== id)
-    })
+    }
   }
 
   function addChallengeSet (set: ChallengeSet) {
@@ -153,7 +155,7 @@ export const useChallengeStore = defineStore('challenge', () => {
         description: 'Capture a genuine candid moment.',
         reward: 15,
         tags: ['candid', 'emotional'],
-      },{
+      }, {
         id: '8',
         title: 'Candid Moment',
         description: 'Capture a genuine candid moment.',

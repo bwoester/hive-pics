@@ -38,27 +38,27 @@
 </template>
 
 <script setup lang="ts">
-  import { useRoute, useRouter } from 'vue-router';
-  import { useAuthStore } from '@/stores/authStore.ts';
+  import { useRoute, useRouter } from 'vue-router'
+  import { useAuthStore } from '@/stores/authStore.ts'
 
-  const route = useRoute();
-  const router = useRouter();
-  const authStore = useAuthStore();
-  const { isLoggedIn, isLoading, error } = storeToRefs(authStore);
+  const route = useRoute()
+  const router = useRouter()
+  const authStore = useAuthStore()
+  const { isLoggedIn, isLoading, error } = storeToRefs(authStore)
 
   /**
    * Handle Google sign-in button click
    */
   const handleGoogleSignIn = async () => {
     // Get the redirect path from the query parameters or fall back to '/dashboard/'
-    const redirectPath = route.query.redirect as string || '/dashboard/';
+    const redirectPath = route.query.redirect as string || '/dashboard/'
     if (isLoggedIn.value) {
-      await router.push(redirectPath);
-      return;
+      await router.push(redirectPath)
+      return
     }
-    await authStore.login();
-    await router.push(redirectPath);
-  };
+    await authStore.login()
+    await router.push(redirectPath)
+  }
 </script>
 
 <style scoped>

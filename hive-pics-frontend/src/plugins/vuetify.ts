@@ -4,17 +4,17 @@
  * Framework documentation: https://vuetifyjs.com`
  */
 
+import { createI18n, useI18n } from 'vue-i18n'
+// Composables
+import { createVuetify } from 'vuetify'
+
+import { md3 } from 'vuetify/blueprints'
+import { VDateInput } from 'vuetify/labs/components'
+import { de, en } from 'vuetify/locale'
+import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n'
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
-
-// Composables
-import { createVuetify } from 'vuetify'
-import { md3 } from 'vuetify/blueprints';
-import { VDateInput } from 'vuetify/labs/components';
-import { de, en } from 'vuetify/locale'
-import { createVueI18nAdapter } from 'vuetify/locale/adapters/vue-i18n';
-import { createI18n, useI18n } from 'vue-i18n';
 
 const messages = {
   de: {

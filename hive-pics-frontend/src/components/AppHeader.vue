@@ -13,7 +13,6 @@
       </router-link>
     </template>
 
-
     <template #append>
       <!-- Navigation links -->
       <slot name="nav-links" />

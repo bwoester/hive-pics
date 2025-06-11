@@ -159,12 +159,11 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { type Event, useEventStore } from '@/stores/eventStore.ts'
   import { useRouter } from 'vue-router'
   import { storageService } from '@/firebase/storageService.ts'
-  import { useDeviceStore } from '@/stores/deviceStore'
   import { useChallengeStore } from '@/stores/challengeStore.ts'
-
+  import { useDeviceStore } from '@/stores/deviceStore'
+  import { type Event, useEventStore } from '@/stores/eventStore.ts'
 
   const router = useRouter()
   const deviceStore = useDeviceStore()
@@ -196,7 +195,7 @@
   })
 
   const props = defineProps<{
-    isNew: boolean,
+    isNew: boolean
     event: Event
   }>()
 
@@ -223,9 +222,9 @@
 
     // Create a preview of the selected image
     const reader = new FileReader()
-    reader.onload = e => {
+    reader.addEventListener('load', e => {
       imagePreview.value = e.target?.result as string
-    }
+    })
     reader.readAsDataURL(file)
 
     // Reset the file input so the same file can be selected again if needed
@@ -241,9 +240,9 @@
     input.capture = 'environment' // Use the back camera if available
 
     // Handle the captured image
-    input.onchange = e => {
+    input.addEventListener('change', e => {
       handleFileUpload(e)
-    }
+    })
 
     // Trigger the camera
     input.click()
@@ -257,7 +256,7 @@
   }
 
   function delay (ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 
   async function saveEvent () {
