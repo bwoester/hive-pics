@@ -7,7 +7,7 @@
         <img
           alt="Logo"
           class="logo"
-          src="@/assets/logo.svg"
+          src="../assets/logo.svg"
         >
         <span class="ml-2"><b>Hive</b> Pics</span>
       </router-link>

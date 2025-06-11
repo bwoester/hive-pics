@@ -7,12 +7,12 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'hive-pics-frontend/**'
+      - '../../packages/hive-pics-frontend/**'
       - '.github/workflows/hive-pics-frontend.yml'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'hive-pics-frontend/**'
+      - '../../packages/hive-pics-frontend/**'
       - '.github/workflows/hive-pics-frontend.yml'
 
 jobs:

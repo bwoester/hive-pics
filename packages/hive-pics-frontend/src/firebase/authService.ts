@@ -1,6 +1,6 @@
 import type { UserCredential } from 'firebase/auth'
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-import { auth } from '@/firebase'
+import { auth } from '@/firebase/index'
 
 export async function logoutUser (): Promise<void> {
   return auth.signOut()

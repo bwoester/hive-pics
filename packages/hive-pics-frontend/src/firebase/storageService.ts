@@ -1,5 +1,5 @@
 import { deleteObject, getDownloadURL, listAll, ref as storageRef, uploadBytes } from 'firebase/storage'
-import { auth, storage } from '@/firebase'
+import { auth, storage } from '@/firebase/index'
 
 export const storageService = {
 

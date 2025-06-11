@@ -1,0 +1,9 @@
+{
+  "name": "hive-pics",
+  "private": true,
+  "workspaces": [
+    "packages/functions",
+    "packages/shared",
+    "packages/hive-pics-frontend"
+  ]
+}

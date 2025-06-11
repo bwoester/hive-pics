@@ -6,7 +6,7 @@
       <router-link class="mr-4 text-white logo" to="/">
         <img
           alt="Logo"
-          src="@/assets/logo-no-text.png"
+          src="../assets/logo-no-text.png"
         >
         <span class="ml-2"><b>Hive</b> Pics</span>
       </router-link>

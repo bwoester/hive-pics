@@ -1,5 +1,5 @@
+import type { Event } from '@hivepics/shared/event'
 import type { Unsubscribe } from 'firebase/firestore'
-import type { Event } from '../../../shared/event.ts'
 // Utilities
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
@@ -7,7 +7,7 @@ import { eventService } from '@/firebase/eventService.ts'
 import { useAuthStore } from '@/stores/authStore.ts'
 
 // TODO not sure yet where to store types in the long run
-export type { Event } from '../../../shared/event.ts'
+export type { Event } from '@hivepics/shared/event'
 
 export const useEventStore = defineStore('event', () => {
   const currentEvent = ref<Event | null>(null)

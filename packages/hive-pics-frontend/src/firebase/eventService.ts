@@ -8,7 +8,7 @@ import {
   query,
   setDoc,
 } from 'firebase/firestore'
-import { db } from '@/firebase'
+import { db } from '@/firebase/index'
 
 export const eventService = {
   /**
