@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
     {
-        ignores: ['lib/**', 'node_modules/**'],
+        ignores: ['dist/**', 'node_modules/**'],
     },
     eslint.configs.recommended,
     tseslint.configs.recommendedTypeChecked,
@@ -13,7 +13,12 @@ export default tseslint.config(
     {
         languageOptions: {
             parserOptions: {
-                projectService: true,
+                projectService: {
+                    allowDefaultProject: [
+                        "eslint.config.js",
+                        "tsup.config.ts"
+                    ]
+                },
                 tsconfigRootDir: import.meta.dirname,
             },
         },

@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
+    "declaration": true,      // This generates .d.ts files
+    "declarationMap": true,   // Optional: generates sourcemaps for .d.ts files
     "module": "NodeNext",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "lib",
-    "paths": {
-      "@hivepics/shared": ["../shared/src"]
-    },
     "sourceMap": true,
     "strict": true,
     "target": "es2017"

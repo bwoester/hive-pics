@@ -1,3 +1,0 @@
-- move `shared` out of frontend-2
-- move `functions` out of frontend-2
-- re-initialize firebase project at monorepo root
