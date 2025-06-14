@@ -1,3 +1,3 @@
-import type {GuestToken} from "./guestToken.js";
+import type { GuestToken } from "./guestToken.js";
 
-export type {GuestToken};
+export type { GuestToken };

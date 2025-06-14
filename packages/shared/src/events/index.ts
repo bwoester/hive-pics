@@ -1,3 +1,3 @@
-import type {Event} from "./event.js";
+import type { Event } from "./event.js";
 
-export type {Event};
+export type { Event };

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "declaration": true,      // This generates .d.ts files
-    "declarationMap": true,   // Optional: generates sourcemaps for .d.ts files
+    "declaration": true, // This generates .d.ts files
+    "declarationMap": true, // Optional: generates sourcemaps for .d.ts files
     "module": "NodeNext",
     "esModuleInterop": true,
     "moduleResolution": "nodenext",
@@ -13,7 +13,5 @@
     "target": "es2017"
   },
   "compileOnSave": true,
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
