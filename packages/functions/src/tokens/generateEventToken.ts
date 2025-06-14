@@ -95,6 +95,7 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>({
     // Create the guest token object
     const guestToken: GuestToken = {
         token,
+        userId,
         eventId,
         createdAt,
     };

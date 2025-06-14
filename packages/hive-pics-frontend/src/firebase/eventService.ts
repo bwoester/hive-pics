@@ -80,7 +80,7 @@ export const eventService = {
       ? doc(eventsCollection, event.id)
       : doc(eventsCollection)
 
-    const eventToSave = {
+    const eventToSave: Event = {
       ...event,
       id: eventDoc.id,
     }
