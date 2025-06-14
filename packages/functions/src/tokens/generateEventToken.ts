@@ -28,8 +28,7 @@ interface OutputData {
  *
  * This Firebase callable function creates a unique token associated with an event ID.
  * The token is generated using cryptographically secure methods and stored in Firestore
- * with a timestamp for when it was issued. The token is also directly updated in the event document.
- * Tokens do not expire automatically.
+ * with a timestamp for when it was issued. Tokens do not expire automatically.
  *
  * @param request - CallableRequest containing the eventId in the data property and auth information
  * @returns Object containing success status, message, and eventId
@@ -108,11 +107,6 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>({
             guestToken,
             createdAt: FieldValue.serverTimestamp(),
         });
-
-    // Update the event document with the token
-    await eventRef.update({
-        token,
-    });
 
     // Return a meaningful response without the token
     return {
