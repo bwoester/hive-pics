@@ -1,9 +1,6 @@
 {
   "name": "hive-pics",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "devDependencies": {
     "firebase-tools": "^14.7.0"
   }
