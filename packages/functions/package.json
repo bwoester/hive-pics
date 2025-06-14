@@ -2,6 +2,7 @@
   "name": "functions",
   "type": "module",
   "scripts": {
+    "format": "prettier . --write",
     "lint": "eslint . --fix",
     "build": "tsup",
     "serve": "npm run build && firebase emulators:start --only functions",
