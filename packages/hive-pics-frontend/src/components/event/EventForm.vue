@@ -158,13 +158,13 @@
 </template>
 
 <script setup lang="ts">
+  import type { Event } from '@hivepics/shared'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { storageService } from '@/firebase/storageService.ts'
   import { useChallengeStore } from '@/stores/challengeStore.ts'
   import { useDeviceStore } from '@/stores/deviceStore'
-  import { type Event, useEventStore } from '@/stores/eventStore.ts'
-
+  import { useEventStore } from '@/stores/eventStore.ts'
   const router = useRouter()
   const deviceStore = useDeviceStore()
   const eventStore = useEventStore()

@@ -1,5 +1,5 @@
+import type { Event } from '@hivepics/shared'
 import type { Unsubscribe } from 'firebase/firestore'
-import type { Event } from '@/stores/eventStore'
 import {
   collection,
   deleteDoc,

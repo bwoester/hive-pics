@@ -1,4 +1,4 @@
-import type { GuestToken } from '@hivepics/shared/src/guestTokens/guestToken'
+import type { GuestToken } from '@hivepics/shared'
 import type { Unsubscribe } from 'firebase/firestore'
 import {
   collection,

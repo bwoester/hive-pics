@@ -54,6 +54,9 @@ importers:
       '@fontsource/roboto':
         specifier: 5.2.6
         version: 5.2.6
+      '@hivepics/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@mdi/font':
         specifier: 7.4.47
         version: 7.4.47
