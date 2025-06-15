@@ -111,14 +111,12 @@ export const guestTokenService = {
     }
 
     const tokenRef = doc(collection(db, 'guestTokens'))
-    const token: GuestToken = {
+    return {
       token: tokenRef.id,
       userId,
       eventId,
       createdAt: new Date(),
     }
-
-    return token
   },
 
   /**
