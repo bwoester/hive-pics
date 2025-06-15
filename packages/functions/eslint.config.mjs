@@ -2,6 +2,7 @@
 
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
+import globals from "globals";
 
 export default tseslint.config(
   {
@@ -14,15 +15,24 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["eslint.config.js", "tsup.config.ts"],
+          allowDefaultProject: [
+            ".mocharc.cjs",
+            "eslint.config.mjs",
+            "tsup.config.ts",
+          ],
         },
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
   {
-    // disable type-aware linting on JS files
-    files: ["**/*.js", "**/*.mjs"],
+    // disable type-aware linting on JS files and configure globals
+    files: ["**/*.cjs", "**/*.js", "**/*.mjs"],
     extends: [tseslint.configs.disableTypeChecked],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
   },
 );
