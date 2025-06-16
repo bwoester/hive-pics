@@ -3,16 +3,10 @@ import {
   HttpsError,
   onCall,
 } from "firebase-functions/v2/https";
-import * as crypto from "crypto";
+
+import { getFirestore } from "firebase-admin/firestore";
+import { guestTokenService } from "@/services/guestTokenService";
 import type { GuestToken } from "@hivepics/shared";
-import basex from "base-x";
-
-import { initializeApp } from "firebase-admin/app";
-import { FieldValue, getFirestore } from "firebase-admin/firestore";
-
-initializeApp();
-
-const db = getFirestore();
 
 /**
  * Interface for the data required to generate an event token
@@ -63,6 +57,8 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(
       );
     }
 
+    const db = getFirestore();
+
     // Verify the event exists and belongs to the user
     const eventRef = db.doc(`users/${userId}/events/${eventId}`);
     const eventDoc = await eventRef.get();
@@ -74,44 +70,11 @@ export const generateEventToken = onCall<InputData, Promise<OutputData>>(
       );
     }
 
-    // Generate a secure random token using basex for base62 encoding
-    // 20 characters in base62 provides ~119 bits of entropy
-    const TOKEN_LENGTH = 20;
-    const randomBytes: Buffer<ArrayBufferLike> = crypto.randomBytes(16); // 16 bytes = 128 bits
+    // Create a new token
+    const token: GuestToken = guestTokenService.createNewToken(eventId, userId);
 
-    // Encode the random bytes using base62 alphabet with basex
-    const BASE62_ALPHABET =
-      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const base62 = basex(BASE62_ALPHABET);
-    let token = base62.encode(Buffer.from(randomBytes));
-
-    // Ensure the token is the correct length
-    while (token.length < TOKEN_LENGTH) {
-      const randomNum = Math.floor(Math.random() * 62);
-      token = BASE62_ALPHABET[randomNum] + token;
-    }
-
-    // Truncate if too long
-    if (token.length > TOKEN_LENGTH) {
-      token = token.substring(token.length - TOKEN_LENGTH);
-    }
-
-    // Record the current timestamp
-    const createdAt = new Date();
-
-    // Create the guest token object
-    const guestToken: GuestToken = {
-      token,
-      userId,
-      eventId,
-      createdAt,
-    };
-
-    // Store the token in Firestore
-    await db.collection("guestTokens").doc(token).set({
-      guestToken,
-      createdAt: FieldValue.serverTimestamp(),
-    });
+    // Save the created token
+    await guestTokenService.saveToken(token);
 
     // Return a meaningful response without the token
     return {

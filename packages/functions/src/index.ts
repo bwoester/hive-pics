@@ -10,5 +10,11 @@
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
 
+// Initialize Firebase Admin SDK
+import { initializeApp } from "firebase-admin/app";
+initializeApp();
+
+// Cloud Function exports
 import { generateEventToken } from "./tokens/generateEventToken.js";
+
 export { generateEventToken };

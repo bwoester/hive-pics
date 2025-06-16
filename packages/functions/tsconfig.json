@@ -11,7 +11,11 @@
     "resolveJsonModule": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "compileOnSave": true,
   "include": ["src/**/*"],
