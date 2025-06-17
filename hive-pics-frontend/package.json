@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@fontsource/roboto": "5.2.6",
-    "@hivepics/shared": "workspace:*",
     "@mdi/font": "7.4.47",
     "firebase": "^11.9.1",
     "vue": "^3.5.16",

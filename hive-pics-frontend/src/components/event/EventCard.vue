@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { Event } from '@hivepics/shared'
+  import type { Event } from '@shared'
 
   const props = defineProps<{
     event: Event

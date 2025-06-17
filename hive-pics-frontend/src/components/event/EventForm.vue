@@ -158,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-  import type { Event } from '@hivepics/shared'
+  import type { Event } from '@shared'
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import { storageService } from '@/firebase/storageService.ts'

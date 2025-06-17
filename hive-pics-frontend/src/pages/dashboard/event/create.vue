@@ -28,7 +28,7 @@ meta:
 </template>
 
 <script setup lang="ts">
-  import type { Event } from '@hivepics/shared'
+  import type { Event } from '@shared'
   import { useEventStore } from '@/stores/eventStore.ts'
 
   const eventStore = useEventStore()

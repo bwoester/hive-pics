@@ -1,4 +1,4 @@
-import type { Event } from '@hivepics/shared'
+import type { Event } from '@shared'
 import type { Unsubscribe } from 'firebase/firestore'
 // Utilities
 import { defineStore } from 'pinia'
