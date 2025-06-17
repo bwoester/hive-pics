@@ -16,7 +16,11 @@
           variant="text"
           >Edit</v-btn
         >
-        <v-btn color="primary" prepend-icon="mdi-eye" variant="text"
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-eye"
+          :to="`/events/${event.id}/`"
+          variant="text"
           >View Event</v-btn
         >
         <v-spacer />

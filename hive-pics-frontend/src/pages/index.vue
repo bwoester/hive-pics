@@ -347,7 +347,13 @@
             <p class="text-h6 mb-6">
               Join Hive Pics today and start collecting memories together
             </p>
-            <v-btn class="mx-2" color="white" size="x-large" :to="`/dashboard/`" variant="elevated">
+            <v-btn
+              class="mx-2"
+              color="white"
+              size="x-large"
+              :to="`/dashboard/`"
+              variant="elevated"
+            >
               Get Started Now
               <v-icon end>mdi-arrow-right</v-icon>
             </v-btn>

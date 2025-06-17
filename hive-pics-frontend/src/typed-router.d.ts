@@ -19,9 +19,14 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
+    '/[...path]': RouteRecordInfo<'/[...path]', '/:path(.*)', { path: ParamValue<true> }, { path: ParamValue<false> }>,
     '/dashboard/': RouteRecordInfo<'/dashboard/', '/dashboard', Record<never, never>, Record<never, never>>,
     '/dashboard/events/[id]': RouteRecordInfo<'/dashboard/events/[id]', '/dashboard/events/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/dashboard/events/create': RouteRecordInfo<'/dashboard/events/create', '/dashboard/events/create', Record<never, never>, Record<never, never>>,
+    '/events/': RouteRecordInfo<'/events/', '/events', Record<never, never>, Record<never, never>>,
+    '/events/[eventId]/': RouteRecordInfo<'/events/[eventId]/', '/events/:eventId', { eventId: ParamValue<true> }, { eventId: ParamValue<false> }>,
+    '/events/[eventId]/challenges': RouteRecordInfo<'/events/[eventId]/challenges', '/events/:eventId/challenges', { eventId: ParamValue<true> }, { eventId: ParamValue<false> }>,
+    '/events/[eventId]/gallery': RouteRecordInfo<'/events/[eventId]/gallery', '/events/:eventId/gallery', { eventId: ParamValue<true> }, { eventId: ParamValue<false> }>,
     '/legalNotice': RouteRecordInfo<'/legalNotice', '/legalNotice', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/privacyPolicy': RouteRecordInfo<'/privacyPolicy', '/privacyPolicy', Record<never, never>, Record<never, never>>,

@@ -32,6 +32,10 @@
               <v-list-item-title>{{ userDisplayName }}</v-list-item-title>
             </v-list-item>
             <v-divider />
+            <v-list-item to="/dashboard">
+              <v-list-item-title>Dashboard</v-list-item-title>
+            </v-list-item>
+            <v-divider />
             <v-list-item @click="logout">
               <v-list-item-title class="text-red">Logout</v-list-item-title>
             </v-list-item>
@@ -39,7 +43,12 @@
         </v-menu>
       </template>
       <template v-else>
-        <v-btn class="ml-2" prepend-icon="mdi-login" to="/dashboard" variant="flat">
+        <v-btn
+          class="ml-2"
+          prepend-icon="mdi-login"
+          to="/dashboard"
+          variant="flat"
+        >
           Login
         </v-btn>
       </template>
@@ -48,11 +57,12 @@
 </template>
 
 <script setup lang="ts">
-import {useRoute, useRouter} from "vue-router";
-import {useAuthStore} from "@/stores/authStore.ts";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore.ts";
 
 const authStore = useAuthStore();
-const { isLoggedIn, userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore);
+const { isLoggedIn, userDisplayName, userPhotoURL, userInitials } =
+  storeToRefs(authStore);
 
 const router = useRouter();
 
