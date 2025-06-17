@@ -3,9 +3,7 @@
     <v-row justify="center">
       <v-col cols="12" lg="6" md="8" sm="10">
         <v-card class="pa-6 mt-4">
-          <v-card-title class="text-h4 mb-4">
-            Legal Notice
-          </v-card-title>
+          <v-card-title class="text-h4 mb-4"> Legal Notice </v-card-title>
 
           <v-card-text>
             <div class="mb-4">
@@ -16,8 +14,8 @@
             <div class="mb-4">
               <div class="text-subtitle-1 font-weight-bold mb-1">Address</div>
               <div class="text-body-1">
-                Bahnhofstr. 22<br>
-                86368 Gersthofen<br>
+                Bahnhofstr. 22<br />
+                86368 Gersthofen<br />
                 Germany
               </div>
             </div>
@@ -41,9 +39,11 @@
             <div class="mb-4">
               <div class="text-h5 mb-3">Disclaimer</div>
               <div class="text-body-1">
-                This project is currently in development and available for testing purposes only.
-                Any references to pricing or plans are for illustrative purposes and do not constitute a binding commercial offer.
-                A formal commercial launch is intended for the future.
+                This project is currently in development and available for
+                testing purposes only. Any references to pricing or plans are
+                for illustrative purposes and do not constitute a binding
+                commercial offer. A formal commercial launch is intended for the
+                future.
               </div>
             </div>
           </v-card-text>

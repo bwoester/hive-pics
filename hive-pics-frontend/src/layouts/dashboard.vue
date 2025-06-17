@@ -1,18 +1,16 @@
 <template>
   <v-app-bar color="primary">
-
     <!-- Logo and AppName as link to landing page -->
     <template #prepend>
       <router-link class="mr-4 text-white logo" to="/">
-        <img
-          alt="Logo"
-          src="../assets/logo-no-text.png"
-        >
+        <img alt="Logo" src="../assets/logo-no-text.png" />
         <span class="ml-2"><b>Hive</b> Pics</span>
       </router-link>
     </template>
 
-    <v-toolbar-title class="d-none d-md-flex text-truncate">Dashboard</v-toolbar-title>
+    <v-toolbar-title class="d-none d-md-flex text-truncate"
+      >Dashboard</v-toolbar-title
+    >
 
     <!-- User Info and Logout -->
     <v-menu offset-y>
@@ -51,19 +49,19 @@
 </template>
 
 <script lang="ts" setup>
-  import { useRouter } from 'vue-router'
-  import { useAuthStore } from '@/stores/authStore.ts'
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/authStore.ts";
 
-  const authStore = useAuthStore()
-  const router = useRouter()
+const authStore = useAuthStore();
+const router = useRouter();
 
-  const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore)
+const { userDisplayName, userPhotoURL, userInitials } = storeToRefs(authStore);
 
-  async function logout (event: Event) {
-    await authStore.logout()
-    await router.push({ name: '/' })
-    event.preventDefault()
-  }
+async function logout(event: Event) {
+  await authStore.logout();
+  await router.push({ name: "/" });
+  event.preventDefault();
+}
 </script>
 
 <style scoped lang="sass">

@@ -39,7 +39,9 @@
 </template>
 
 <script lang="ts" setup>
-  function scrollToSection (sectionId: string) {
-    document.querySelector(`#${sectionId}`)?.scrollIntoView({ behavior: 'smooth' })
-  }
+function scrollToSection(sectionId: string) {
+  document
+    .querySelector(`#${sectionId}`)
+    ?.scrollIntoView({ behavior: "smooth" });
+}
 </script>

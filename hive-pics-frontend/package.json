@@ -11,7 +11,8 @@
     "test:unit:ci": "vitest --run",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@fontsource/roboto": "5.2.6",
@@ -33,6 +34,7 @@
     "jsdom": "^26.1.0",
     "npm-run-all2": "^8.0.4",
     "pinia": "^3.0.3",
+    "prettier": "3.5.3",
     "resize-observer-polyfill": "^1.5.1",
     "sass-embedded": "^1.89.2",
     "typescript": "~5.8.3",

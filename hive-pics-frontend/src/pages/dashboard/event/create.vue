@@ -13,11 +13,7 @@ meta:
       type="error"
     >
       <template #append>
-        <v-btn
-          color="error"
-          :to="{ name: '/dashboard/' }"
-          variant="text"
-        >
+        <v-btn color="error" :to="{ name: '/dashboard/' }" variant="text">
           Return to Dashboard
         </v-btn>
       </template>
@@ -28,9 +24,9 @@ meta:
 </template>
 
 <script setup lang="ts">
-  import type { Event } from '@shared'
-  import { useEventStore } from '@/stores/eventStore.ts'
+import type { Event } from "@shared";
+import { useEventStore } from "@/stores/eventStore.ts";
 
-  const eventStore = useEventStore()
-  const newEvent: Event | null = eventStore.createNewEvent()
+const eventStore = useEventStore();
+const newEvent: Event | null = eventStore.createNewEvent();
 </script>

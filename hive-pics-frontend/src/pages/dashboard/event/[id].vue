@@ -6,7 +6,6 @@ meta:
 
 <template>
   <v-container>
-
     <v-alert
       v-if="!event"
       text="Unable to open event"
@@ -14,11 +13,7 @@ meta:
       type="error"
     >
       <template #append>
-        <v-btn
-          color="error"
-          :to="{ name: '/dashboard/' }"
-          variant="text"
-        >
+        <v-btn color="error" :to="{ name: '/dashboard/' }" variant="text">
           Return to Dashboard
         </v-btn>
       </template>
@@ -29,15 +24,14 @@ meta:
 </template>
 
 <script setup lang="ts">
-  import type { Event } from '@shared'
-  import { useEventStore } from '@/stores/eventStore.ts'
-  const eventStore = useEventStore()
+import type { Event } from "@shared";
+import { useEventStore } from "@/stores/eventStore.ts";
+const eventStore = useEventStore();
 
-  const eventWithIdParam = useRoute('/dashboard/event/[id]')
-  const eventId = eventWithIdParam.params.id
+const eventWithIdParam = useRoute("/dashboard/event/[id]");
+const eventId = eventWithIdParam.params.id;
 
-  const event: Event | null = eventStore.getEventById(eventId)
-
+const event: Event | null = eventStore.getEventById(eventId);
 </script>
 
 <style scoped>

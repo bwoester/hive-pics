@@ -1,135 +1,135 @@
-import type { Event } from '@shared'
-import type { Unsubscribe } from 'firebase/firestore'
+import type { Event } from "@shared";
+import type { Unsubscribe } from "firebase/firestore";
 // Utilities
-import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
-import { eventService } from '@/firebase/eventService.ts'
-import { useAuthStore } from '@/stores/authStore.ts'
+import { defineStore } from "pinia";
+import { computed, ref } from "vue";
+import { eventService } from "@/firebase/eventService.ts";
+import { useAuthStore } from "@/stores/authStore.ts";
 
-export const useEventStore = defineStore('event', () => {
-  const currentEvent = ref<Event | null>(null)
-  const events = ref<Event[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
-  const authStore = useAuthStore()
+export const useEventStore = defineStore("event", () => {
+  const currentEvent = ref<Event | null>(null);
+  const events = ref<Event[]>([]);
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
+  const authStore = useAuthStore();
 
   // Keep track of active subscriptions
-  let eventsUnsubscribe: Unsubscribe | null = null
+  let eventsUnsubscribe: Unsubscribe | null = null;
 
   // Getters
   const getEventById = computed(() => (id: string) => {
-    return events.value.find(event => event.id === id) || null
-  })
+    return events.value.find((event) => event.id === id) || null;
+  });
 
-  const isEmpty = computed(() => events.value.length === 0)
+  const isEmpty = computed(() => events.value.length === 0);
 
   // Actions
-  function setCurrentEvent (event: Event | null) {
-    currentEvent.value = event
+  function setCurrentEvent(event: Event | null) {
+    currentEvent.value = event;
   }
 
-  function subscribeToEvents () {
+  function subscribeToEvents() {
     if (!authStore.user?.uid) {
-      error.value = 'User must be authenticated'
-      return
+      error.value = "User must be authenticated";
+      return;
     }
 
     // Clean up existing subscription if any
-    unsubscribeFromEvents()
+    unsubscribeFromEvents();
 
-    isLoading.value = true
-    error.value = null
+    isLoading.value = true;
+    error.value = null;
 
     try {
       eventsUnsubscribe = eventService.subscribeToEvents(
         authStore.user.uid,
-        updatedEvents => {
-          events.value = updatedEvents
-          isLoading.value = false
+        (updatedEvents) => {
+          events.value = updatedEvents;
+          isLoading.value = false;
         },
-      )
+      );
     } catch (error_) {
-      error.value = 'Failed to subscribe to events'
-      console.error(error_)
-      isLoading.value = false
+      error.value = "Failed to subscribe to events";
+      console.error(error_);
+      isLoading.value = false;
     }
   }
 
-  function unsubscribeFromEvents () {
+  function unsubscribeFromEvents() {
     if (eventsUnsubscribe) {
-      eventsUnsubscribe()
-      eventsUnsubscribe = null
+      eventsUnsubscribe();
+      eventsUnsubscribe = null;
     }
   }
 
-  function createNewEvent (): Event | null {
+  function createNewEvent(): Event | null {
     if (!authStore.user?.uid) {
-      error.value = 'User must be authenticated'
-      return null
+      error.value = "User must be authenticated";
+      return null;
     }
 
-    isLoading.value = true
-    error.value = null
+    isLoading.value = true;
+    error.value = null;
     try {
-      return eventService.createNewEvent(authStore.user.uid)
+      return eventService.createNewEvent(authStore.user.uid);
     } catch (error_) {
-      error.value = 'Failed to create new event'
-      console.error(error_)
-      return null
+      error.value = "Failed to create new event";
+      console.error(error_);
+      return null;
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
   }
 
-  async function saveEvent (event: Event) {
+  async function saveEvent(event: Event) {
     if (!authStore.user?.uid) {
-      error.value = 'User must be authenticated'
-      return false
+      error.value = "User must be authenticated";
+      return false;
     }
 
-    isLoading.value = true
-    error.value = null
+    isLoading.value = true;
+    error.value = null;
     try {
-      await eventService.saveEvent(authStore.user.uid, event)
-      return true
+      await eventService.saveEvent(authStore.user.uid, event);
+      return true;
     } catch (error_) {
-      error.value = 'Failed to save event'
-      console.error(error_)
-      return false
+      error.value = "Failed to save event";
+      console.error(error_);
+      return false;
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
   }
 
-  async function deleteEvent (id: string) {
+  async function deleteEvent(id: string) {
     if (!authStore.user?.uid) {
-      error.value = 'User must be authenticated'
-      return false
+      error.value = "User must be authenticated";
+      return false;
     }
 
-    isLoading.value = true
-    error.value = null
+    isLoading.value = true;
+    error.value = null;
     try {
-      await eventService.deleteEvent(authStore.user.uid, id)
-      return true
+      await eventService.deleteEvent(authStore.user.uid, id);
+      return true;
     } catch (error_) {
-      error.value = 'Failed to delete event'
-      console.error(error_)
-      return false
+      error.value = "Failed to delete event";
+      console.error(error_);
+      return false;
     } finally {
-      isLoading.value = false
+      isLoading.value = false;
     }
   }
 
-  const { isLoggedIn } = storeToRefs(authStore)
+  const { isLoggedIn } = storeToRefs(authStore);
 
   watchEffect(() => {
     if (isLoggedIn.value) {
-      subscribeToEvents()
+      subscribeToEvents();
     } else {
-      unsubscribeFromEvents()
+      unsubscribeFromEvents();
     }
-  })
+  });
 
   return {
     currentEvent,
@@ -144,5 +144,5 @@ export const useEventStore = defineStore('event', () => {
     createNewEvent,
     saveEvent,
     deleteEvent,
-  }
-})
+  };
+});
