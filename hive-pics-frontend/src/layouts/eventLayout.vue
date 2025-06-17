@@ -2,7 +2,6 @@
   <AppHeader />
 
   <v-main>
-    event layout
     <router-view />
   </v-main>
 

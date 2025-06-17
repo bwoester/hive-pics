@@ -1,6 +1,7 @@
 <route lang="yaml">
 meta:
   layout: dashboard
+  requiresAuth: true
 </route>
 
 <template>

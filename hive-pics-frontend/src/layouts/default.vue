@@ -2,8 +2,6 @@
   <AppHeader />
 
   <v-main>
-    default layout
-
     <router-view />
   </v-main>
 
