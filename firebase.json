@@ -6,7 +6,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "packages/hive-pics-frontend/dist",
+    "public": "hive-pics-frontend/dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -24,7 +24,7 @@
   },
   "functions": [
     {
-      "source": "packages/functions",
+      "source": "functions",
       "codebase": "default",
       "ignore": [
         "node_modules",
