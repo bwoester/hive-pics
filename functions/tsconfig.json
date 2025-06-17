@@ -15,7 +15,8 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/backend/*"],
-      "@shared/*": ["./src/shared/*"]
+      "@shared/*": ["./src/shared/*"],
+      "@shared": ["./src/shared"]
     }
   },
   "compileOnSave": true,

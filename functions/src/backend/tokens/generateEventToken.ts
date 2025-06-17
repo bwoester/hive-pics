@@ -6,7 +6,7 @@ import {
 
 import { getFirestore } from "firebase-admin/firestore";
 import { guestTokenService } from "@/services/guestTokenService";
-import type { GuestToken } from "@hivepics/shared";
+import type { GuestToken } from "@shared";
 
 /**
  * Interface for the data required to generate an event token

@@ -1,4 +1,4 @@
-import type { GuestToken } from "@hivepics/shared";
+import type { GuestToken } from "@shared";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 
 export const guestTokenService = {
