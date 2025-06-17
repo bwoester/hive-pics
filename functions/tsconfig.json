@@ -14,7 +14,8 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["./src/backend/*"],
+      "@shared/*": ["./src/shared/*"]
     }
   },
   "compileOnSave": true,
