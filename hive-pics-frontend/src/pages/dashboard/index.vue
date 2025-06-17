@@ -13,7 +13,7 @@ meta:
           color="primary"
           prepend-icon="mdi-plus"
           size="large"
-          :to="{ name: '/dashboard/event/create' }"
+          :to="{ name: '/dashboard/events/create' }"
         >
           Create New Event
         </v-btn>
@@ -46,7 +46,7 @@ meta:
           <v-btn
             color="primary"
             prepend-icon="mdi-plus"
-            :to="{ name: '/dashboard/event/create' }"
+            :to="{ name: '/dashboard/events/create' }"
             >Create Your First Event
           </v-btn>
         </v-sheet>

@@ -12,7 +12,7 @@
         <v-btn
           color="primary"
           prepend-icon="mdi-pencil"
-          :to="`/dashboard/event/${event.id}`"
+          :to="`/dashboard/events/${event.id}`"
           variant="text"
           >Edit</v-btn
         >

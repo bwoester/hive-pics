@@ -28,7 +28,7 @@ import type { Event } from "@shared";
 import { useEventStore } from "@/stores/eventStore.ts";
 const eventStore = useEventStore();
 
-const eventWithIdParam = useRoute("/dashboard/event/[id]");
+const eventWithIdParam = useRoute("/dashboard/events/[id]");
 const eventId = eventWithIdParam.params.id;
 
 const event: Event | null = eventStore.getEventById(eventId);
