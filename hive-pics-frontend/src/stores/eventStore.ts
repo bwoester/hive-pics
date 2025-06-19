@@ -7,7 +7,9 @@ import { eventService } from "@/firebase/eventService.ts";
 import { useAuthStore } from "@/stores/authStore.ts";
 
 export const useEventStore = defineStore("event", () => {
-  const currentEvent = ref<Event | null>(null);
+  const currentEventId = ref<string | null>(
+    localStorage.getItem("currentEventId"),
+  );
   const events = ref<Event[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -21,11 +23,28 @@ export const useEventStore = defineStore("event", () => {
     return events.value.find((event) => event.id === id) || null;
   });
 
+  const hasCurrentEventId = computed((): boolean => {
+    return currentEventId.value !== null;
+  });
+
+  const getCurrentEvent = computed((): Event | null => {
+    if (!currentEventId.value) {
+      return null;
+    }
+    return getEventById.value(currentEventId.value);
+  });
+
   const isEmpty = computed(() => events.value.length === 0);
 
   // Actions
-  function setCurrentEvent(event: Event | null) {
-    currentEvent.value = event;
+  function setCurrentEventId(id: string) {
+    localStorage.setItem("currentEventId", id);
+    currentEventId.value = id;
+  }
+
+  function clearCurrentEventId() {
+    localStorage.removeItem("currentEventId");
+    currentEventId.value = null;
   }
 
   function subscribeToEvents() {
@@ -132,13 +151,15 @@ export const useEventStore = defineStore("event", () => {
   });
 
   return {
-    currentEvent,
     isEmpty,
     events,
     isLoading,
     error,
     getEventById,
-    setCurrentEvent,
+    hasCurrentEventId,
+    getCurrentEvent,
+    setCurrentEventId,
+    clearCurrentEventId,
     subscribeToEvents,
     unsubscribeFromEvents,
     createNewEvent,

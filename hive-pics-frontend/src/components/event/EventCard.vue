@@ -19,8 +19,8 @@
         <v-btn
           color="primary"
           prepend-icon="mdi-eye"
-          :to="`/events/${event.id}/`"
           variant="text"
+          @click="viewEvent"
           >View Event</v-btn
         >
         <v-spacer />
@@ -32,6 +32,8 @@
 
 <script setup lang="ts">
 import type { Event } from "@shared";
+import { useRouter } from "vue-router";
+import { useEventStore } from "@/stores/eventStore.ts";
 
 const props = defineProps<{
   event: Event;
@@ -40,6 +42,14 @@ const props = defineProps<{
 const imageUrl = computed(
   () => props.event.coverImageUrl || "https://picsum.photos/500/300?random=1",
 );
+
+const eventStore = useEventStore();
+const router = useRouter();
+
+function viewEvent() {
+  eventStore.setCurrentEventId(props.event.id);
+  router.push({ name: "/event/gallery" });
+}
 </script>
 
 <style scoped></style>
