@@ -1,10 +1,10 @@
 <template>
-  <v-app-bar color="primary">
+  <v-app-bar color="primary" scroll-behavior="hide">
     <!-- Logo and AppName as link to landing page -->
     <template #prepend>
       <router-link class="mr-4 text-white" to="/" @click="handleLogoClick">
         <img alt="Logo" class="logo" src="../assets/logo.svg" />
-        <span class="ml-2"><b>Hive</b> Pics</span>
+        <span class="ml-2"><b>Hive</b>Pics</span>
       </router-link>
     </template>
 

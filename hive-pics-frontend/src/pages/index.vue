@@ -7,7 +7,7 @@
           <v-container>
             <v-row align="center" justify="center">
               <v-col class="text-center" cols="12" md="6">
-                <h1 class="text-h2 font-weight-bold mb-4">Hive Pics</h1>
+                <h1 class="text-h2 font-weight-bold mb-4">HivePics</h1>
                 <p class="text-h6 mb-6">
                   A collaborative photo collection service for all your events
                 </p>
@@ -172,20 +172,20 @@
             </v-card>
           </v-col>
 
-          <v-col cols="12" md="4" sm="6">
-            <v-card class="bg-transparent" variant="flat">
-              <v-card-item>
-                <v-card-title>
-                  <v-icon class="me-2" color="primary">mdi-flag</v-icon>
-                  Content Moderation
-                </v-card-title>
-                <v-card-text>
-                  Keep albums appropriate with reporting features for
-                  inappropriate content.
-                </v-card-text>
-              </v-card-item>
-            </v-card>
-          </v-col>
+          <!--          <v-col cols="12" md="4" sm="6">-->
+          <!--            <v-card class="bg-transparent" variant="flat">-->
+          <!--              <v-card-item>-->
+          <!--                <v-card-title>-->
+          <!--                  <v-icon class="me-2" color="primary">mdi-flag</v-icon>-->
+          <!--                  Content Moderation-->
+          <!--                </v-card-title>-->
+          <!--                <v-card-text>-->
+          <!--                  Keep albums appropriate with reporting features for-->
+          <!--                  inappropriate content.-->
+          <!--                </v-card-text>-->
+          <!--              </v-card-item>-->
+          <!--            </v-card>-->
+          <!--          </v-col>-->
 
           <v-col cols="12" md="4" sm="6">
             <v-card class="bg-transparent" variant="flat">
@@ -219,7 +219,7 @@
           <v-card class="mx-auto" height="100%" max-width="400">
             <v-card-item>
               <v-card-title class="text-center">
-                <h3 class="text-h5">Basic</h3>
+                <h3 class="text-h5">Starter</h3>
               </v-card-title>
               <div class="text-center">
                 <span class="text-h4">Free</span>
@@ -228,25 +228,26 @@
                 <v-list density="compact">
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="1 active album"
+                    title="Up to 3 guests"
                   />
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Up to 50 photos"
+                    title="Up to 25 photos"
                   />
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Basic photo challenges"
+                    title="Test all features"
                   />
                   <v-list-item
-                    class="text-disabled"
-                    prepend-icon="mdi-close"
-                    title="Album expires after 30 days"
+                    prepend-icon="mdi-check"
+                    title="Album expires after 7 days"
                   />
                 </v-list>
               </v-card-text>
               <v-card-actions class="justify-center">
-                <v-btn color="primary" variant="outlined">Start Free</v-btn>
+                <v-btn color="primary" to="/dashboard/" variant="tonal"
+                  >Start Free</v-btn
+                >
               </v-card-actions>
             </v-card-item>
           </v-card>
@@ -262,34 +263,73 @@
           >
             <v-card-item>
               <v-card-title class="text-center">
-                <h3 class="text-h5">Pro</h3>
+                <h3 class="text-h5">Basic</h3>
               </v-card-title>
               <div class="text-center">
-                <span class="text-h4">$9.99</span>
-                <span class="text-caption">/month</span>
+                <span class="text-h4">$</span>
+                <span class="text-caption">(one time payment)</span>
               </div>
               <v-card-text>
                 <v-list density="compact">
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Up to 5 active albums"
+                    title="Up to 25 guests"
                   />
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Up to 500 photos per album"
+                    title="Up to 500 photos"
                   />
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Advanced photo challenges"
-                  />
-                  <v-list-item
-                    prepend-icon="mdi-check"
-                    title="Albums stored for 1 year"
+                    title="Album stored for 1 month"
                   />
                 </v-list>
               </v-card-text>
               <v-card-actions class="justify-center">
-                <v-btn color="primary">Choose Pro</v-btn>
+                <v-btn color="primary" to="/dashboard/" variant="tonal"
+                  >Start Free</v-btn
+                >
+              </v-card-actions>
+            </v-card-item>
+          </v-card>
+        </v-col>
+
+        <v-col cols="12" md="4">
+          <v-card
+            border
+            class="mx-auto"
+            color="primary-lighten-5"
+            height="100%"
+            max-width="400"
+          >
+            <v-card-item>
+              <v-card-title class="text-center">
+                <h3 class="text-h5">Plus</h3>
+              </v-card-title>
+              <div class="text-center">
+                <span class="text-h4">$$</span>
+                <span class="text-caption">(one time payment)</span>
+              </div>
+              <v-card-text>
+                <v-list density="compact">
+                  <v-list-item
+                    prepend-icon="mdi-check"
+                    title="Up to 75 guests"
+                  />
+                  <v-list-item
+                    prepend-icon="mdi-check"
+                    title="Up to 3.000 photos"
+                  />
+                  <v-list-item
+                    prepend-icon="mdi-check"
+                    title="Album stored for 3 months"
+                  />
+                </v-list>
+              </v-card-text>
+              <v-card-actions class="justify-center">
+                <v-btn color="primary" to="/dashboard/" variant="tonal"
+                  >Start Free</v-btn
+                >
               </v-card-actions>
             </v-card-item>
           </v-card>
@@ -299,35 +339,31 @@
           <v-card class="mx-auto" height="100%" max-width="400">
             <v-card-item>
               <v-card-title class="text-center">
-                <h3 class="text-h5">Event Planner</h3>
+                <h3 class="text-h5">Deluxe</h3>
               </v-card-title>
               <div class="text-center">
-                <span class="text-h4">$24.99</span>
-                <span class="text-caption">/month</span>
+                <span class="text-h4">$$$</span>
+                <span class="text-caption">(one time payment)</span>
               </div>
               <v-card-text>
                 <v-list density="compact">
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Unlimited active albums"
+                    title="Up to 200 guests"
                   />
                   <v-list-item
                     prepend-icon="mdi-check"
-                    title="Unlimited photos"
-                  />
-                  <v-list-item
-                    prepend-icon="mdi-check"
-                    title="Premium photo challenges"
-                  />
-                  <v-list-item
-                    prepend-icon="mdi-check"
-                    title="Permanent storage"
+                    title="Up to 15.000 photos"
                   />
                 </v-list>
+                <v-list-item
+                  prepend-icon="mdi-check"
+                  title="Album stored for 6 months"
+                />
               </v-card-text>
               <v-card-actions class="justify-center">
-                <v-btn color="primary" variant="outlined"
-                  >Choose Event Planner</v-btn
+                <v-btn color="primary" to="/dashboard/" variant="tonal"
+                  >Start Free</v-btn
                 >
               </v-card-actions>
             </v-card-item>
@@ -345,13 +381,13 @@
               Ready to Create Your First Album?
             </h2>
             <p class="text-h6 mb-6">
-              Join Hive Pics today and start collecting memories together
+              Join HivePics today and start collecting memories together
             </p>
             <v-btn
               class="mx-2"
               color="white"
               size="x-large"
-              :to="`/dashboard/`"
+              to="/dashboard/"
               variant="elevated"
             >
               Get Started Now

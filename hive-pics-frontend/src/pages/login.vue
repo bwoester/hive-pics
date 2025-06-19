@@ -4,7 +4,7 @@
       <v-col cols="12" lg="6" md="8" sm="10">
         <v-card class="login-card">
           <v-card-title class="text-center">
-            <h1 class="login-title">Hive Pics</h1>
+            <h1 class="login-title">HivePics</h1>
           </v-card-title>
           <v-card-text>
             <p class="text-center mb-6">Sign in to continue</p>

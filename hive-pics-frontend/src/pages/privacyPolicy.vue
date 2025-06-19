@@ -58,7 +58,7 @@
               <div class="text-body-1">
                 <p>We process your personal data for the following purposes:</p>
                 <ul>
-                  <li>To provide and operate the Hive Pics platform</li>
+                  <li>To provide and operate the HivePics platform</li>
                   <li>To allow users to register, log in, and manage events</li>
                   <li>To allow guests to upload photos during events</li>
                   <li>

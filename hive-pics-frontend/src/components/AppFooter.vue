@@ -19,7 +19,7 @@
     </div>
 
     <div class="flex-1-0-100 text-center mt-2 text-caption text-secondary">
-      &copy; {{ new Date().getFullYear() }} Hive Pics. All rights reserved.
+      &copy; {{ new Date().getFullYear() }} HivePics. All rights reserved.
     </div>
   </v-footer>
 </template>
