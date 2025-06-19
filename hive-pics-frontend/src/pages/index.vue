@@ -210,7 +210,9 @@
       <v-row>
         <v-col class="text-center mb-8" cols="12">
           <h2 class="text-h4 font-weight-bold">Pricing</h2>
-          <p class="text-subtitle-1">Choose the package that suits your needs</p>
+          <p class="text-subtitle-1">
+            Choose the package that suits your needs
+          </p>
         </v-col>
       </v-row>
 
