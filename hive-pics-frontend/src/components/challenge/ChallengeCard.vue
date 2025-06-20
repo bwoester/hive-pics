@@ -6,6 +6,7 @@
           {{ challenge.title }}
         </div>
         <v-btn
+          v-if="!preventDismiss"
           class="my-1 ms-2"
           icon="mdi-close"
           size="x-small"
@@ -51,7 +52,10 @@ import type { Challenge } from "@/stores/challengeStore";
 
 const props = defineProps<{
   challenge: Challenge;
+  preventDismiss?: boolean;
 }>();
+
+const preventDismiss = computed(() => props.preventDismiss ?? false);
 
 const emit = defineEmits<{
   (e: "take-photo" | "dismiss", challengeId: string): void;

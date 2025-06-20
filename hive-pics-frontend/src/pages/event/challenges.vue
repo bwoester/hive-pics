@@ -7,6 +7,16 @@ meta:
   <v-container class="d-flex align-center justify-center fill-height">
     <div ref="emblaRef" class="embla">
       <div class="embla__container">
+        <div class="embla__slide">
+          <ChallengeCard
+            :challenge="takePhotoChallenge"
+            class="ma-1"
+            :prevent-dismiss="true"
+            @dismiss="handleDismiss"
+            @take-photo="handleTakePhoto"
+          />
+        </div>
+
         <div
           v-for="challenge in filteredChallenges"
           :key="challenge.id"
@@ -14,7 +24,7 @@ meta:
         >
           <ChallengeCard
             :challenge="challenge"
-            class="card ma-1"
+            class="ma-1"
             @dismiss="handleDismiss"
             @take-photo="handleTakePhoto"
           />
@@ -29,12 +39,21 @@ import emblaCarouselVue from "embla-carousel-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChallengeCard from "@/components/challenge/ChallengeCard.vue";
-import { useChallengeStore } from "@/stores/challengeStore.ts";
+import { type Challenge, useChallengeStore } from "@/stores/challengeStore.ts";
 
-const [emblaRef, emblaApi] = emblaCarouselVue({ loop: false });
+const [emblaRef] = emblaCarouselVue({ loop: false });
 const challengeStore = useChallengeStore();
 const { challenges } = storeToRefs(challengeStore);
 const dismissedChallenges = ref<string[]>([]);
+
+const takePhotoChallenge: Challenge = {
+  id: crypto.randomUUID(),
+  title: "Your Moment's Shot",
+  description:
+    "Simply snap a photo of something that catches your eye – no matter what it is!",
+  reward: 5,
+  tags: ["Spontaneous", "Random", "Simple"],
+};
 
 const filteredChallenges = computed(() => {
   return challenges.value.filter(
@@ -57,9 +76,11 @@ function handleDismiss(challengeId: string) {
 .embla {
   overflow: hidden;
 }
+
 .embla__container {
   display: flex;
 }
+
 .embla__slide {
   flex: 0 0 90%;
   min-width: 0;
