@@ -1,3 +1,10 @@
-# Ignore artifacts:
+# This is already ignored by default
+**/.git
+**/node_modules
+
+# Ignore build artifacts
 dist
-node_modules
+
+# Ignore auto-generated files
+src/auto-imports.d.ts
+src/components.d.ts
