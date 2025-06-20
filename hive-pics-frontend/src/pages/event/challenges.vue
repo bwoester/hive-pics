@@ -4,53 +4,34 @@ meta:
 </route>
 
 <template>
-  <v-carousel
-    class="peek-carousel"
-    :continuous="false"
-    :hide-delimiters="true"
-    progress="primary"
-    :show-arrows="false"
-  >
-    <v-carousel-item
-      v-for="challenge in filteredChallenges"
-      :key="challenge.id"
-      class="peek-carousel-item"
-    >
-      <div class="d-flex justify-center align-center h-100">
-        <div class="challenge-card-container">
+  <v-container class="d-flex align-center justify-center fill-height">
+    <div ref="emblaRef" class="embla">
+      <div class="embla__container">
+        <div
+          v-for="challenge in filteredChallenges"
+          :key="challenge.id"
+          class="embla__slide"
+        >
           <ChallengeCard
             :challenge="challenge"
+            class="card ma-1"
             @dismiss="handleDismiss"
             @take-photo="handleTakePhoto"
           />
         </div>
       </div>
-    </v-carousel-item>
-  </v-carousel>
-
-  <v-slide-group class="peek-carousel">
-    <div class="d-flex flex-wrap">
-      <v-slide-group-item
-        v-for="challenge in filteredChallenges"
-        :key="challenge.id"
-      >
-        <ChallengeCard
-          :challenge="challenge"
-          class="card ma-1"
-          @dismiss="handleDismiss"
-          @take-photo="handleTakePhoto"
-        />
-      </v-slide-group-item>
     </div>
-  </v-slide-group>
+  </v-container>
 </template>
 
 <script setup lang="ts">
+import emblaCarouselVue from "embla-carousel-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChallengeCard from "@/components/challenge/ChallengeCard.vue";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 
+const [emblaRef, emblaApi] = emblaCarouselVue({ loop: false });
 const challengeStore = useChallengeStore();
 const { challenges } = storeToRefs(challengeStore);
 const dismissedChallenges = ref<string[]>([]);
@@ -73,7 +54,14 @@ function handleDismiss(challengeId: string) {
 </script>
 
 <style scoped>
-.card {
-  width: 320px;
+.embla {
+  overflow: hidden;
+}
+.embla__container {
+  display: flex;
+}
+.embla__slide {
+  flex: 0 0 90%;
+  min-width: 0;
 }
 </style>

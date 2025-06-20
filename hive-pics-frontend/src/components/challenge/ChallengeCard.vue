@@ -2,11 +2,11 @@
   <v-card>
     <template #title>
       <div class="d-flex">
-        <div class="me-auto">
+        <div class="me-auto text-wrap text-break">
           {{ challenge.title }}
         </div>
         <v-btn
-          color="error"
+          class="my-1 ms-2"
           icon="mdi-close"
           size="x-small"
           @click="dismissChallenge"
