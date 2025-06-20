@@ -12,7 +12,7 @@ meta:
             :challenge="takePhotoChallenge"
             class="ma-1"
             :prevent-dismiss="true"
-            @dismiss="handleDismiss"
+            variant="tonal"
             @take-photo="handleTakePhoto"
           />
         </div>
@@ -27,6 +27,16 @@ meta:
             class="ma-1"
             @dismiss="handleDismiss"
             @take-photo="handleTakePhoto"
+          />
+        </div>
+
+        <div class="embla__slide">
+          <ChallengeCard
+            :challenge="doMoreChallenge"
+            class="ma-1"
+            :prevent-dismiss="true"
+            :prevent-take-photo="true"
+            variant="tonal"
           />
         </div>
       </div>
@@ -53,6 +63,15 @@ const takePhotoChallenge: Challenge = {
     "Simply snap a photo of something that catches your eye – no matter what it is!",
   reward: 5,
   tags: ["Spontaneous", "Random", "Simple"],
+};
+
+const doMoreChallenge: Challenge = {
+  id: crypto.randomUUID(),
+  title: "More Challenges",
+  description:
+    "Liked the challenges so far? Wanna take on some more? Click below to continue with more challenges!",
+  reward: 0,
+  tags: [],
 };
 
 const filteredChallenges = computed(() => {

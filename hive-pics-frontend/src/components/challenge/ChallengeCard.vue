@@ -1,12 +1,12 @@
 <template>
-  <v-card>
+  <v-card :variant="props.variant">
     <template #title>
       <div class="d-flex">
         <div class="me-auto text-wrap text-break">
           {{ challenge.title }}
         </div>
         <v-btn
-          v-if="!preventDismiss"
+          v-if="!props.preventDismiss"
           class="my-1 ms-2"
           icon="mdi-close"
           size="x-small"
@@ -36,6 +36,16 @@
 
     <template #actions>
       <v-btn
+        v-if="props.preventTakePhoto"
+        class="mx-auto"
+        prepend-icon="mdi-cards"
+        stacked
+        @click="loadMoreChallenges"
+      >
+        Get More
+      </v-btn>
+      <v-btn
+        v-if="!props.preventTakePhoto"
         class="mx-auto"
         prepend-icon="mdi-camera"
         stacked
@@ -48,18 +58,33 @@
 </template>
 
 <script setup lang="ts">
+import type { VCard } from "vuetify/components";
 import type { Challenge } from "@/stores/challengeStore";
+type Variant = VCard["$props"]["variant"];
 
-const props = defineProps<{
-  challenge: Challenge;
-  preventDismiss?: boolean;
-}>();
-
-const preventDismiss = computed(() => props.preventDismiss ?? false);
+const props = withDefaults(
+  defineProps<{
+    challenge: Challenge;
+    variant?: Variant;
+    preventDismiss?: boolean;
+    preventTakePhoto?: boolean;
+  }>(),
+  {
+    variant: undefined,
+    preventDismiss: false,
+    preventTakePhoto: false,
+  },
+);
 
 const emit = defineEmits<{
-  (e: "take-photo" | "dismiss", challengeId: string): void;
+  "load-challenges": [];
+  "take-photo": [challengeId: string];
+  dismiss: [challengeId: string];
 }>();
+
+function loadMoreChallenges() {
+  emit("load-challenges");
+}
 
 function takePhoto() {
   emit("take-photo", props.challenge.id);
