@@ -74,62 +74,14 @@
             </v-col>
 
             <v-col cols="12" md="6">
-              <div>
-                <label class="text-subtitle-1 mb-2 d-block"
-                  >Event Cover Image</label
-                >
-
-                <div class="d-flex flex-wrap gap-2 mb-4">
-                  <v-btn
-                    prepend-icon="mdi-upload"
-                    variant="outlined"
-                    @click="triggerFileInput"
-                  >
-                    Upload Image
-                  </v-btn>
-
-                  <v-btn
-                    v-if="isCameraSupported"
-                    prepend-icon="mdi-camera"
-                    variant="outlined"
-                    @click="openCamera"
-                  >
-                    Take Photo
-                  </v-btn>
-                </div>
-
-                <!-- Hidden file input -->
-                <input
-                  ref="fileInput"
-                  accept="image/*"
-                  class="d-none"
-                  type="file"
-                  @change="handleFileUpload"
-                />
-
-                <!-- Image preview -->
-                <div v-if="imagePreview || event.coverImageUrl" class="mt-3">
-                  <v-img
-                    max-height="200"
-                    max-width="300"
-                    :src="imagePreview || event.coverImageUrl"
-                  />
-                  <div class="d-flex mt-2">
-                    <v-btn
-                      color="error"
-                      density="compact"
-                      icon="mdi-delete"
-                      variant="text"
-                      @click="removeImage"
-                    />
-                  </div>
-                </div>
-
-                <div v-if="isUploading" class="mt-3">
-                  <v-progress-linear indeterminate />
-                  <div class="text-caption">Uploading image...</div>
-                </div>
-              </div>
+              <PhotoCapture
+                :existing-image-url="event.coverImageUrl"
+                :is-uploading="isUploading"
+                label="Event Cover Image"
+                @remove-image="removeImage"
+                @update:file="selectedFile = $event"
+                @update:preview="imagePreview = $event"
+              />
             </v-col>
           </v-row>
         </v-card-text>
@@ -162,6 +114,7 @@
 import type { Event } from "@shared";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import PhotoCapture from "@/components/shared/PhotoCapture.vue";
 import { storageService } from "@/firebase/storageService.ts";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 import { useDeviceStore } from "@/stores/deviceStore";
@@ -172,7 +125,6 @@ const eventStore = useEventStore();
 const challengeStore = useChallengeStore();
 const form = ref(null);
 const isFormValid = ref(false);
-const fileInput = ref<HTMLInputElement | null>(null);
 const imagePreview = ref<string | null>(null);
 const isUploading = ref(false);
 const selectedFile = ref<File | null>(null);
@@ -202,52 +154,6 @@ const props = defineProps<{
 
 // Create a local copy to edit (to prevent direct mutation of prop)
 const event = reactive({ ...props.event });
-
-// Check if the device supports camera capture
-const { isCameraSupported } = storeToRefs(deviceStore);
-
-// Trigger the hidden file input
-function triggerFileInput() {
-  if (fileInput.value) {
-    fileInput.value.click();
-  }
-}
-
-// Handle file selection from the file input
-async function handleFileUpload(e: globalThis.Event) {
-  const target = e.target as HTMLInputElement;
-  if (!target.files || target.files.length === 0) return;
-
-  const file = target.files[0];
-  selectedFile.value = file;
-
-  // Create a preview of the selected image
-  const reader = new FileReader();
-  reader.addEventListener("load", (e) => {
-    imagePreview.value = e.target?.result as string;
-  });
-  reader.readAsDataURL(file);
-
-  // Reset the file input so the same file can be selected again if needed
-  target.value = "";
-}
-
-// Open the camera for capturing a photo
-function openCamera() {
-  // Create a file input that accepts camera input
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.capture = "environment"; // Use the back camera if available
-
-  // Handle the captured image
-  input.addEventListener("change", (e) => {
-    handleFileUpload(e);
-  });
-
-  // Trigger the camera
-  input.click();
-}
 
 // Remove the selected image
 function removeImage() {

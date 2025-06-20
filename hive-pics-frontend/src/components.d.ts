@@ -14,6 +14,7 @@ declare module 'vue' {
     EventCard: typeof import('./components/event/EventCard.vue')['default']
     EventForm: typeof import('./components/event/EventForm.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    PhotoCapture: typeof import('./components/shared/PhotoCapture.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     UnderConstruction: typeof import('./components/UnderConstruction.vue')['default']
