@@ -7,7 +7,6 @@ meta:
   <v-container class="d-flex align-center justify-center fill-height">
     <div ref="emblaRef" class="embla">
       <div class="embla__container">
-
         <!-- Simple, static "take photo" challenge -->
         <div class="embla__slide">
           <ChallengeCard
@@ -35,19 +34,18 @@ meta:
 
         <!-- "Get more challenges" card -->
         <div class="embla__slide">
-          <v-card
-            class="ma-1"
-            title="More Challenges"
-            variant="tonal"
-          >
+          <v-card class="ma-1" title="More Challenges" variant="tonal">
             <template #text>
               <p class="px-2 py-7 font-italic">
-                Liked the challenges so far? Wanna take on some more? Click below to continue with more challenges!
+                Liked the challenges so far? Wanna take on some more? Click
+                below to continue with more challenges!
               </p>
             </template>
 
             <v-card-actions>
-              <v-btn class="mx-auto" prepend-icon="mdi-cards" stacked>Load challenges</v-btn>
+              <v-btn class="mx-auto" prepend-icon="mdi-cards" stacked
+                >Load challenges</v-btn
+              >
             </v-card-actions>
           </v-card>
         </div>
@@ -96,6 +94,7 @@ meta:
 </template>
 
 <script setup lang="ts">
+import type { VCard } from "vuetify/components";
 import type { Challenge } from "@/stores/challengeStore.ts";
 import emblaCarouselVue from "embla-carousel-vue";
 import { storeToRefs } from "pinia";
@@ -105,7 +104,6 @@ import PhotoCapture from "@/components/shared/PhotoCapture.vue";
 import { storageService } from "@/firebase/storageService.ts";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 import { useEventStore } from "@/stores/eventStore.ts";
-import type {VCard} from "vuetify/components";
 
 const eventStore = useEventStore();
 const eventId = eventStore.getCurrentEvent?.id;
@@ -135,15 +133,6 @@ const takePhotoChallenge: Challenge = {
     "Simply snap a photo of something that catches your eye – no matter what it is!",
   reward: 5,
   tags: ["Spontaneous", "Random", "Simple"],
-};
-
-const doMoreChallenge: Challenge = {
-  id: crypto.randomUUID(),
-  title: "More Challenges",
-  description:
-    "Liked the challenges so far? Wanna take on some more? Click below to continue with more challenges!",
-  reward: 0,
-  tags: [],
 };
 
 const filteredChallenges = computed(() => {
