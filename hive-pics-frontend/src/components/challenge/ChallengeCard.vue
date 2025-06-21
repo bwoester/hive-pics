@@ -1,12 +1,12 @@
 <template>
-  <v-card :variant="props.variant">
+  <v-card :variant="challengeCardProps.variant">
     <template #title>
       <div class="d-flex">
         <div class="me-auto text-wrap text-break">
           {{ challenge.title }}
         </div>
         <v-btn
-          v-if="!props.preventDismiss"
+          v-if="!challengeCardProps.preventDismiss"
           class="my-1 ms-2"
           icon="mdi-close"
           size="x-small"
@@ -35,14 +35,27 @@
     </template>
 
     <template #actions>
-      <v-btn
-        class="mx-auto"
-        prepend-icon="mdi-camera"
-        stacked
-        @click="takePhoto"
-      >
-        Take Photo
-      </v-btn>
+      <div class="d-flex align-center w-100">
+        <v-btn prepend-icon="mdi-camera" @click="takePhoto"> Take Photo </v-btn>
+
+        <v-menu>
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              class="ms-auto"
+              icon="mdi-dots-vertical"
+              variant="text"
+            ></v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              prepend-icon="mdi-upload"
+              title="Upload Photo"
+              @click="uploadPhoto"
+            />
+          </v-list>
+        </v-menu>
+      </div>
     </template>
   </v-card>
 </template>
@@ -52,7 +65,7 @@ import type { VCard } from "vuetify/components";
 import type { Challenge } from "@/stores/challengeStore";
 type Variant = VCard["$props"]["variant"];
 
-const props = withDefaults(
+const challengeCardProps = withDefaults(
   defineProps<{
     challenge: Challenge;
     variant?: Variant;
@@ -66,15 +79,20 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   "take-photo": [challengeId: string];
+  "upload-photo": [challengeId: string];
   dismiss: [challengeId: string];
 }>();
 
 function takePhoto() {
-  emit("take-photo", props.challenge.id);
+  emit("take-photo", challengeCardProps.challenge.id);
+}
+
+function uploadPhoto() {
+  emit("upload-photo", challengeCardProps.challenge.id);
 }
 
 function dismissChallenge() {
-  emit("dismiss", props.challenge.id);
+  emit("dismiss", challengeCardProps.challenge.id);
 }
 </script>
 
