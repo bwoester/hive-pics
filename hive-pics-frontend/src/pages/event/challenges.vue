@@ -19,18 +19,20 @@ meta:
         </div>
 
         <!-- All the user's challenges -->
-        <div
-          v-for="challenge in filteredChallenges"
-          :key="challenge.id"
-          class="embla__slide"
-        >
-          <ChallengeCard
-            :challenge="challenge"
-            class="ma-1"
-            @dismiss="handleDismiss"
-            @take-photo="handleTakePhoto"
-          />
-        </div>
+        <TransitionGroup name="challenge-card">
+          <div
+            v-for="challenge in filteredChallenges"
+            :key="challenge.id"
+            class="embla__slide"
+          >
+            <ChallengeCard
+              :challenge="challenge"
+              class="ma-1"
+              @dismiss="handleDismiss"
+              @take-photo="handleTakePhoto"
+            />
+          </div>
+        </TransitionGroup>
 
         <!-- "Get more challenges" card -->
         <div class="embla__slide">
@@ -225,4 +227,20 @@ function showError(message: string) {
   flex: 0 0 90%;
   min-width: 0;
 }
+
+.challenge-card-leave-active {
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.challenge-card-leave-to {
+  opacity: 0;
+  transform: translateY(100px) scale(0.7);
+}
+
+/* Apply color to the card and all its children */
+.challenge-card-leave-to .v-card {
+  background-color: rgba(244, 67, 54, 0.3) !important;
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 </style>
