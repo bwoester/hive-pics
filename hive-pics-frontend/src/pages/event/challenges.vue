@@ -7,6 +7,8 @@ meta:
   <v-container class="d-flex align-center justify-center fill-height">
     <div ref="emblaRef" class="embla">
       <div class="embla__container">
+
+        <!-- Simple, static "take photo" challenge -->
         <div class="embla__slide">
           <ChallengeCard
             :challenge="takePhotoChallenge"
@@ -17,6 +19,7 @@ meta:
           />
         </div>
 
+        <!-- All the user's challenges -->
         <div
           v-for="challenge in filteredChallenges"
           :key="challenge.id"
@@ -30,14 +33,23 @@ meta:
           />
         </div>
 
+        <!-- "Get more challenges" card -->
         <div class="embla__slide">
-          <ChallengeCard
-            :challenge="doMoreChallenge"
+          <v-card
             class="ma-1"
-            :prevent-dismiss="true"
-            :prevent-take-photo="true"
+            title="More Challenges"
             variant="tonal"
-          />
+          >
+            <template #text>
+              <p class="px-2 py-7 font-italic">
+                Liked the challenges so far? Wanna take on some more? Click below to continue with more challenges!
+              </p>
+            </template>
+
+            <v-card-actions>
+              <v-btn class="mx-auto" prepend-icon="mdi-cards" stacked>Load challenges</v-btn>
+            </v-card-actions>
+          </v-card>
         </div>
       </div>
     </div>
@@ -93,6 +105,7 @@ import PhotoCapture from "@/components/shared/PhotoCapture.vue";
 import { storageService } from "@/firebase/storageService.ts";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 import { useEventStore } from "@/stores/eventStore.ts";
+import type {VCard} from "vuetify/components";
 
 const eventStore = useEventStore();
 const eventId = eventStore.getCurrentEvent?.id;

@@ -36,16 +36,6 @@
 
     <template #actions>
       <v-btn
-        v-if="props.preventTakePhoto"
-        class="mx-auto"
-        prepend-icon="mdi-cards"
-        stacked
-        @click="loadMoreChallenges"
-      >
-        Get More
-      </v-btn>
-      <v-btn
-        v-if="!props.preventTakePhoto"
         class="mx-auto"
         prepend-icon="mdi-camera"
         stacked
@@ -67,24 +57,17 @@ const props = withDefaults(
     challenge: Challenge;
     variant?: Variant;
     preventDismiss?: boolean;
-    preventTakePhoto?: boolean;
   }>(),
   {
     variant: undefined,
     preventDismiss: false,
-    preventTakePhoto: false,
   },
 );
 
 const emit = defineEmits<{
-  "load-challenges": [];
   "take-photo": [challengeId: string];
   dismiss: [challengeId: string];
 }>();
-
-function loadMoreChallenges() {
-  emit("load-challenges");
-}
 
 function takePhoto() {
   emit("take-photo", props.challenge.id);
