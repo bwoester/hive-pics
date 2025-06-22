@@ -8,13 +8,14 @@ meta:
     <div ref="emblaRef" class="embla">
       <div class="embla__container">
         <!-- Simple, static "take photo" challenge -->
-        <div class="embla__slide">
+        <div v-if="takePhotoChallenge" class="embla__slide">
           <ChallengeCard
             :challenge="takePhotoChallenge"
             class="ma-1"
             :prevent-dismiss="true"
             variant="tonal"
             @take-photo="handleTakePhoto"
+            @upload-photo="handleUploadPhoto"
           />
         </div>
 
@@ -30,6 +31,7 @@ meta:
               class="ma-1"
               @dismiss="handleDismiss"
               @take-photo="handleTakePhoto"
+              @upload-photo="handleUploadPhoto"
             />
           </div>
         </TransitionGroup>
@@ -54,36 +56,38 @@ meta:
       </div>
     </div>
 
-    <!-- Photo Capture Dialog -->
-    <v-dialog v-model="showPhotoDialog" max-width="500">
-      <v-card>
-        <v-card-title>
-          {{ currentChallenge ? currentChallenge.title : "Take a Photo" }}
-        </v-card-title>
-        <v-card-text>
-          <PhotoCapture
-            :is-uploading="isUploading"
-            label="Challenge Photo"
-            @update:file="selectedFile = $event"
-            @update:preview="imagePreview = $event"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="error" variant="text" @click="closePhotoDialog"
-            >Cancel</v-btn
-          >
-          <v-btn
-            color="primary"
-            :disabled="!selectedFile"
-            :loading="isUploading"
-            @click="uploadChallengePhoto"
-          >
-            Submit
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- hidden file inputs -->
+
+    <!-- allows to select images from device -->
+    <input
+      ref="selectImageInput"
+      accept="image/*"
+      class="d-none"
+      type="file"
+      @change="handleImageInputChange"
+    />
+
+    <!-- opens camera to take environment image -->
+    <input
+      ref="takeEnvironmentPhotoInput"
+      accept="image/*"
+      capture="environment"
+      class="d-none"
+      type="file"
+      @change="handleImageInputChange"
+    />
+
+    <!-- opens camera to take user image (selfie) -->
+    <input
+      ref="takeUserPhotoInput"
+      accept="image/*"
+      capture="user"
+      class="d-none"
+      type="file"
+      @change="handleImageInputChange"
+    />
+
+    <v-img v-if="selectedImageObjectURL" :src="selectedImageObjectURL"></v-img>
 
     <!-- Snackbar for notifications -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
@@ -102,24 +106,24 @@ import emblaCarouselVue from "embla-carousel-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChallengeCard from "@/components/challenge/ChallengeCard.vue";
-import PhotoCapture from "@/components/shared/PhotoCapture.vue";
-import { storageService } from "@/firebase/storageService.ts";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
-import { useEventStore } from "@/stores/eventStore.ts";
 
-const eventStore = useEventStore();
-const eventId = eventStore.getCurrentEvent?.id;
 const [emblaRef] = emblaCarouselVue({ loop: false });
 const challengeStore = useChallengeStore();
-const { challenges } = storeToRefs(challengeStore);
+const { takePhotoChallenge, challenges } = storeToRefs(challengeStore);
 const dismissedChallenges = ref<string[]>([]);
 
-// Photo capture state
-const showPhotoDialog = ref(false);
-const currentChallenge = ref<Challenge | null>(null);
-const selectedFile = ref<File | null>(null);
-const imagePreview = ref<string | null>(null);
-const isUploading = ref(false);
+const selectImageInput = ref<HTMLInputElement | null>(null);
+const takeEnvironmentPhotoInput = ref<HTMLInputElement | null>(null);
+const takeUserPhotoInput = ref<HTMLInputElement | null>(null);
+const selectedImage = ref<File | null>(null);
+const selectedImageObjectURL = ref<string | null>(null);
+
+onUnmounted(() => {
+  if (selectedImageObjectURL.value) {
+    URL.revokeObjectURL(selectedImageObjectURL.value);
+  }
+});
 
 // Snackbar state
 const snackbar = ref({
@@ -128,15 +132,6 @@ const snackbar = ref({
   color: "success",
 });
 
-const takePhotoChallenge: Challenge = {
-  id: crypto.randomUUID(),
-  title: "Your Moment's Shot",
-  description:
-    "Simply snap a photo of something that catches your eye – no matter what it is!",
-  reward: 5,
-  tags: ["Spontaneous", "Random", "Simple"],
-};
-
 const filteredChallenges = computed(() => {
   return challenges.value.filter(
     (challenge) => !dismissedChallenges.value.includes(challenge.id),
@@ -144,57 +139,81 @@ const filteredChallenges = computed(() => {
 });
 
 function handleTakePhoto(challengeId: string) {
-  // Find the challenge by ID
-  currentChallenge.value =
-    challengeId === takePhotoChallenge.id
-      ? takePhotoChallenge
-      : challenges.value.find((c) => c.id === challengeId) || null;
+  const challenge: Challenge | null =
+    challengeStore.getChallengeById(challengeId);
 
-  // Open the photo dialog
-  showPhotoDialog.value = true;
-}
-
-function closePhotoDialog() {
-  showPhotoDialog.value = false;
-  selectedFile.value = null;
-  imagePreview.value = null;
-  currentChallenge.value = null;
-}
-
-async function uploadChallengePhoto() {
-  if (!selectedFile.value || !currentChallenge.value) return;
-
-  try {
-    isUploading.value = true;
-
-    // Upload the image to Firebase Storage
-    const imageUrl = await storageService.uploadChallengePhoto(
-      selectedFile.value,
-      currentChallenge.value.id,
-      eventId,
-    );
-
-    console.log("Uploaded image URL:", imageUrl);
-
-    // Here you would typically save the challenge completion to your database
-    // For example: await challengeStore.completeChallenge(currentChallenge.value.id, imageUrl);
-
-    showSuccess("Photo uploaded successfully!");
-
-    // Close the dialog after a short delay
-    setTimeout(() => {
-      closePhotoDialog();
-    }, 1000);
-  } catch (error) {
-    console.error("Error uploading challenge photo:", error);
-    showError("Failed to upload photo");
-  } finally {
-    isUploading.value = false;
+  if (!challenge) {
+    showError("Challenge not found: " + challengeId);
+    return;
   }
+
+  const tags: string[] = challenge.tags;
+  const title: string = challenge.title;
+  const description: string = challenge.description;
+
+  // Normalize everything to lowercase for case-insensitive search
+  const lowerTags = tags.map((tag) => tag.toLowerCase());
+  const lowerTitle = title.toLowerCase();
+  const lowerDescription = description.toLowerCase();
+
+  if (
+    lowerTags.includes("selfie") ||
+    lowerTitle.includes("selfie") ||
+    lowerDescription.includes("selfie")
+  ) {
+    console.log("Taking user photo...")
+    triggerTakeUserPhotoInput();
+  } else {
+    console.log("Taking environment photo...")
+    triggerTakeEnvironmentPhotoInput();
+  }
+}
+
+function handleUploadPhoto(_challengeId: string) {
+  triggerSelectImageInput();
 }
 
 function handleDismiss(challengeId: string) {
   dismissedChallenges.value.push(challengeId);
+}
+
+function triggerSelectImageInput() {
+  if (selectImageInput.value) {
+    selectImageInput.value.click();
+  }
+}
+
+function triggerTakeEnvironmentPhotoInput() {
+  if (takeEnvironmentPhotoInput.value) {
+    takeEnvironmentPhotoInput.value.click();
+  }
+}
+
+function triggerTakeUserPhotoInput() {
+  if (takeUserPhotoInput.value) {
+    takeUserPhotoInput.value.click();
+  }
+}
+
+function handleImageInputChange(e: globalThis.Event) {
+  const target = e.target as HTMLInputElement;
+  if (!target.files || target.files.length === 0) {
+    showError("No image selected");
+    return;
+  }
+
+  const file: File = target.files[0];
+
+  if (selectedImageObjectURL.value) {
+    URL.revokeObjectURL(selectedImageObjectURL.value);
+  }
+  selectedImage.value = file;
+  selectedImageObjectURL.value = URL.createObjectURL(file);
+
+  showSuccess("Image preview successfull");
+
+  // Reset the file input so the same file can be selected again if needed
+  target.value = "";
 }
 
 function showSuccess(message: string) {
@@ -242,5 +261,4 @@ function showError(message: string) {
   background-color: rgba(244, 67, 54, 0.3) !important;
   transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 </style>

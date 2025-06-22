@@ -21,6 +21,7 @@ export interface ChallengeSet {
 
 export const useChallengeStore = defineStore("challenge", () => {
   // State
+  const takePhotoChallenge = ref<Challenge | null>(null);
   const challenges = ref<Challenge[]>([]);
   const challengeSets = ref<ChallengeSet[]>([]);
   const isLoading = ref(false);
@@ -106,8 +107,18 @@ export const useChallengeStore = defineStore("challenge", () => {
 
   // Initialize with test data
   function initializeTestData() {
+    takePhotoChallenge.value = {
+      id: "105ca3e6-a46b-477e-b890-1a284d84acee",
+      title: "Your Moment's Shot",
+      description:
+        "Simply snap a photo of something that catches your eye – no matter what it is!",
+      reward: 5,
+      tags: ["Spontaneous", "Random", "Simple"],
+    };
+
     // Sample challenges
     const testChallenges: Challenge[] = [
+      takePhotoChallenge.value,
       {
         id: "1",
         title: "Group Selfie",
@@ -302,6 +313,7 @@ export const useChallengeStore = defineStore("challenge", () => {
 
   return {
     // State
+    takePhotoChallenge,
     challenges,
     challengeSets,
     isLoading,
