@@ -87,7 +87,11 @@ meta:
       @change="handleImageInputChange"
     />
 
-    <v-img v-if="selectedImageObjectURL" :src="selectedImageObjectURL"></v-img>
+    <ImagePreviewDialog
+      ref="imagePreviewDialog"
+      :image-url="selectedImageObjectURL"
+      :show-description-input="true"
+    />
 
     <!-- Snackbar for notifications -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
@@ -106,6 +110,7 @@ import emblaCarouselVue from "embla-carousel-vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChallengeCard from "@/components/challenge/ChallengeCard.vue";
+import ImagePreviewDialog from "@/components/shared/ImagePreviewDialog.vue";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 
 const [emblaRef] = emblaCarouselVue({ loop: false });
@@ -118,6 +123,7 @@ const takeEnvironmentPhotoInput = ref<HTMLInputElement | null>(null);
 const takeUserPhotoInput = ref<HTMLInputElement | null>(null);
 const selectedImage = ref<File | null>(null);
 const selectedImageObjectURL = ref<string | null>(null);
+const imagePreviewDialog = ref<typeof ImagePreviewDialog | null>(null);
 
 onUnmounted(() => {
   if (selectedImageObjectURL.value) {
@@ -161,10 +167,10 @@ function handleTakePhoto(challengeId: string) {
     lowerTitle.includes("selfie") ||
     lowerDescription.includes("selfie")
   ) {
-    console.log("Taking user photo...")
+    console.log("Taking user photo...");
     triggerTakeUserPhotoInput();
   } else {
-    console.log("Taking environment photo...")
+    console.log("Taking environment photo...");
     triggerTakeEnvironmentPhotoInput();
   }
 }
@@ -209,6 +215,9 @@ function handleImageInputChange(e: globalThis.Event) {
   }
   selectedImage.value = file;
   selectedImageObjectURL.value = URL.createObjectURL(file);
+
+  // Open the dialog after setting the image URL
+  imagePreviewDialog.value?.showDialog();
 
   showSuccess("Image preview successfull");
 
