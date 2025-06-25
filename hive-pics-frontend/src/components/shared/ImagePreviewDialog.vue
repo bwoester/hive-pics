@@ -43,42 +43,42 @@
           ></v-textarea>
 
           <!-- Image Editing Controls -->
-<!--          <v-expansion-panels class="mt-4">-->
-<!--            <v-expansion-panel title="Image Editing Options">-->
-<!--              <v-expansion-panel-text>-->
-<!--                &lt;!&ndash; Cropping Options &ndash;&gt;-->
-<!--                <div class="mb-4">-->
-<!--                  <v-subheader>Cropping Options</v-subheader>-->
-<!--                  <v-btn-group variant="outlined">-->
-<!--                    <v-btn @click="applyCrop('free')">Free Crop</v-btn>-->
-<!--                    <v-btn @click="applyCrop('square')">Square</v-btn>-->
-<!--                    <v-btn @click="applyCrop('16:9')">16:9</v-btn>-->
-<!--                    <v-btn @click="applyCrop('4:3')">4:3</v-btn>-->
-<!--                  </v-btn-group>-->
-<!--                </div>-->
+          <!--          <v-expansion-panels class="mt-4">-->
+          <!--            <v-expansion-panel title="Image Editing Options">-->
+          <!--              <v-expansion-panel-text>-->
+          <!--                &lt;!&ndash; Cropping Options &ndash;&gt;-->
+          <!--                <div class="mb-4">-->
+          <!--                  <v-subheader>Cropping Options</v-subheader>-->
+          <!--                  <v-btn-group variant="outlined">-->
+          <!--                    <v-btn @click="applyCrop('free')">Free Crop</v-btn>-->
+          <!--                    <v-btn @click="applyCrop('square')">Square</v-btn>-->
+          <!--                    <v-btn @click="applyCrop('16:9')">16:9</v-btn>-->
+          <!--                    <v-btn @click="applyCrop('4:3')">4:3</v-btn>-->
+          <!--                  </v-btn-group>-->
+          <!--                </div>-->
 
-<!--                &lt;!&ndash; Fitting Options &ndash;&gt;-->
-<!--                <div class="mb-4">-->
-<!--                  <v-subheader>Fitting Options</v-subheader>-->
-<!--                  <v-btn-group variant="outlined">-->
-<!--                    <v-btn @click="applyFit('fit')">Fit</v-btn>-->
-<!--                    <v-btn @click="applyFit('fill')">Fill</v-btn>-->
-<!--                  </v-btn-group>-->
-<!--                </div>-->
+          <!--                &lt;!&ndash; Fitting Options &ndash;&gt;-->
+          <!--                <div class="mb-4">-->
+          <!--                  <v-subheader>Fitting Options</v-subheader>-->
+          <!--                  <v-btn-group variant="outlined">-->
+          <!--                    <v-btn @click="applyFit('fit')">Fit</v-btn>-->
+          <!--                    <v-btn @click="applyFit('fill')">Fill</v-btn>-->
+          <!--                  </v-btn-group>-->
+          <!--                </div>-->
 
-<!--                &lt;!&ndash; Filter Options &ndash;&gt;-->
-<!--                <div>-->
-<!--                  <v-subheader>Filter Options</v-subheader>-->
-<!--                  <v-btn-group variant="outlined">-->
-<!--                    <v-btn @click="applyFilter('none')">None</v-btn>-->
-<!--                    <v-btn @click="applyFilter('grayscale')">Grayscale</v-btn>-->
-<!--                    <v-btn @click="applyFilter('sepia')">Sepia</v-btn>-->
-<!--                    <v-btn @click="applyFilter('vivid')">Vivid</v-btn>-->
-<!--                  </v-btn-group>-->
-<!--                </div>-->
-<!--              </v-expansion-panel-text>-->
-<!--            </v-expansion-panel>-->
-<!--          </v-expansion-panels>-->
+          <!--                &lt;!&ndash; Filter Options &ndash;&gt;-->
+          <!--                <div>-->
+          <!--                  <v-subheader>Filter Options</v-subheader>-->
+          <!--                  <v-btn-group variant="outlined">-->
+          <!--                    <v-btn @click="applyFilter('none')">None</v-btn>-->
+          <!--                    <v-btn @click="applyFilter('grayscale')">Grayscale</v-btn>-->
+          <!--                    <v-btn @click="applyFilter('sepia')">Sepia</v-btn>-->
+          <!--                    <v-btn @click="applyFilter('vivid')">Vivid</v-btn>-->
+          <!--                  </v-btn-group>-->
+          <!--                </div>-->
+          <!--              </v-expansion-panel-text>-->
+          <!--            </v-expansion-panel>-->
+          <!--          </v-expansion-panels>-->
         </v-card-text>
 
         <v-card-actions>
@@ -168,20 +168,20 @@ watch(dialogVisible, (newValue) => {
 
 // Stub methods for image editing features
 // These would be implemented with actual image editing libraries
-function applyCrop(cropType: string) {
-  console.log(`Applying crop: ${cropType}`);
-  // In a real implementation, this would apply the crop to the image
-}
+// function applyCrop(cropType: string) {
+//   console.log(`Applying crop: ${cropType}`);
+//   // In a real implementation, this would apply the crop to the image
+// }
 
-function applyFit(fitType: string) {
-  console.log(`Applying fit: ${fitType}`);
-  // In a real implementation, this would apply the fit to the image
-}
+// function applyFit(fitType: string) {
+//   console.log(`Applying fit: ${fitType}`);
+//   // In a real implementation, this would apply the fit to the image
+// }
 
-function applyFilter(filterType: string) {
-  console.log(`Applying filter: ${filterType}`);
-  // In a real implementation, this would apply the filter to the image
-}
+// function applyFilter(filterType: string) {
+//   console.log(`Applying filter: ${filterType}`);
+//   // In a real implementation, this would apply the filter to the image
+// }
 
 // Submit the image with optional description
 function submit() {
