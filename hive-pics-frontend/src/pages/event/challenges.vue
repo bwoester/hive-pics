@@ -280,7 +280,7 @@ async function handleSubmitPhoto({
 
     showSuccess("Challenge completed!");
   } catch (error) {
-    showError("Error submitting challenge: " + error);
+    showError("Error: " + error);
   }
 }
 

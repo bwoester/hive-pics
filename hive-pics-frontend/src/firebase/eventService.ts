@@ -18,6 +18,7 @@ import {
   getDownloadURL,
   ref as storageRef,
   uploadBytes,
+  uploadBytesResumable,
 } from "firebase/storage";
 import { challengePhotoConverter } from "@/firebase/converters.ts";
 import { db, storage } from "@/firebase/index";
@@ -139,6 +140,7 @@ export const eventService = {
     challengeId: string,
     challengePhoto: File,
     description?: string,
+    onProgress?: (progress: number) => void
   ): Promise<ChallengePhoto> {
     if (!challengePhoto) {
       throw new Error("Challenge photo is required");
@@ -168,17 +170,29 @@ export const eventService = {
       storage,
       challengePhotoFilePath,
     );
-    let challengePhotoDownloadURL: string;
-    try {
-      const snapshot = await uploadBytes(
-        challengePhotoStorageRef,
-        challengePhoto,
+    const challengePhotoDownloadURL = await new Promise<string>((resolve, reject) => {
+      const uploadTask = uploadBytesResumable(challengePhotoStorageRef, challengePhoto);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          onProgress?.(progress);
+        },
+        (error) => reject(error),
+      async () => {
+          try {
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve(url);
+          } catch (error) {
+            if (error instanceof Error) {
+              reject(error);
+            } else {
+              reject(new Error("Upload failed: " + JSON.stringify(error)));
+            }
+          }
+        }
       );
-      challengePhotoDownloadURL = await getDownloadURL(snapshot.ref);
-    } catch (error) {
-      console.error("Error uploading image:", error);
-      throw new Error("Failed to upload image");
-    }
+    });
 
     // write document
     const challengePhotoDoc: ChallengePhoto = {
@@ -195,8 +209,9 @@ export const eventService = {
     try {
       await setDoc(challengePhotoDocRef, challengePhotoDoc);
     } catch (error) {
-      console.error("Error storing challengePhotoDoc:", error);
-      throw new Error("Failed to store challengePhotoDoc");
+      // roll back the upload
+      await deleteDoc(challengePhotoDocRef);
+      throw error;
     }
 
     return challengePhotoDoc;
