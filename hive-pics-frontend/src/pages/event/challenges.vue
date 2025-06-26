@@ -282,7 +282,6 @@ async function handleSubmitPhoto({
   } catch (error) {
     showError("Error submitting challenge: " + error);
   }
-
 }
 
 function cancel() {

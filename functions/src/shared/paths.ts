@@ -30,7 +30,7 @@ export const paths = {
     challengePhotoDocId: string,
     challengePhoto: File,
   ): string => {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const extension =
       challengePhoto.name.split(".").pop()?.toLowerCase() ?? "unknown";
     const challengePhotoFileName = `${timestamp}-${challengePhotoDocId}.${extension}`;
