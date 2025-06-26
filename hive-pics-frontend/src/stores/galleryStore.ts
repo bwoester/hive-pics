@@ -5,16 +5,14 @@ import { onSnapshot, query } from "firebase/firestore";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { eventService } from "@/firebase/eventService.ts";
-import { useChallengeStore } from "@/stores/challengeStore.ts";
+import { useAuthStore } from "@/stores/authStore.ts";
 import { useEventStore } from "@/stores/eventStore.ts";
-import {useAuthStore} from "@/stores/authStore.ts";
 
 export const useGalleryStore = defineStore("gallery", () => {
   const photos = ref<ChallengePhoto[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const eventStore = useEventStore();
-  const challengeStore = useChallengeStore();
   const authStore = useAuthStore();
 
   // Keep track of active subscriptions
@@ -43,7 +41,9 @@ export const useGalleryStore = defineStore("gallery", () => {
     // Sort photos within each group by createdAt (newest first)
     for (const challengeId of Object.keys(grouped)) {
       grouped[challengeId].sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       });
     }
 
@@ -72,10 +72,10 @@ export const useGalleryStore = defineStore("gallery", () => {
 
     try {
       // TODO how to get host user ID?
-      const wrongUserId = authStore.user?.uid || '';
+      const wrongUserId = authStore.user?.uid || "";
       const photosCollection = eventService.challengePhotosCollection(
         wrongUserId,
-        eventStore.currentEventId
+        eventStore.currentEventId,
       );
 
       const photosQuery = query(photosCollection);
@@ -94,7 +94,7 @@ export const useGalleryStore = defineStore("gallery", () => {
           console.error("Error fetching photos:", err);
           error.value = "Failed to fetch photos";
           isLoading.value = false;
-        }
+        },
       );
     } catch (error_) {
       error.value = "Failed to subscribe to photos";
@@ -111,14 +111,18 @@ export const useGalleryStore = defineStore("gallery", () => {
   }
 
   // Watch for changes in the current event ID
-  watch(() => eventStore.currentEventId, (newEventId) => {
-    if (newEventId) {
-      subscribeToPhotos();
-    } else {
-      unsubscribeFromPhotos();
-      photos.value = [];
-    }
-  }, { immediate: true });
+  watch(
+    () => eventStore.currentEventId,
+    (newEventId) => {
+      if (newEventId) {
+        subscribeToPhotos();
+      } else {
+        unsubscribeFromPhotos();
+        photos.value = [];
+      }
+    },
+    { immediate: true },
+  );
 
   return {
     photos,

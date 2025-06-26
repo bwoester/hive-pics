@@ -24,24 +24,46 @@ meta:
     <div v-else class="gallery-container">
       <h2>All Photos</h2>
       <div class="photo-grid">
-        <div v-for="photo in allPhotosSorted" :key="photo.id" class="photo-card">
-          <img :alt="photo.description || 'Challenge photo'" class="photo-image" :src="photo.downloadUrl" />
+        <div
+          v-for="photo in allPhotosSorted"
+          :key="photo.id"
+          class="photo-card"
+        >
+          <img
+            :alt="photo.description || 'Challenge photo'"
+            class="photo-image"
+            :src="photo.downloadUrl"
+          />
           <div class="photo-info">
-            <p v-if="photo.description" class="photo-description">{{ photo.description }}</p>
-            <p class="photo-challenge">{{ getChallengeTitle(photo.challengeId) }}</p>
+            <p v-if="photo.description" class="photo-description">
+              {{ photo.description }}
+            </p>
+            <p class="photo-challenge">
+              {{ getChallengeTitle(photo.challengeId) }}
+            </p>
             <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
           </div>
         </div>
       </div>
 
       <h2 class="section-title">Photos by Challenge</h2>
-      <div v-for="(photos, challengeId) in photosByChallenge" :key="challengeId" class="challenge-section">
+      <div
+        v-for="(photos, challengeId) in photosByChallenge"
+        :key="challengeId"
+        class="challenge-section"
+      >
         <h3>{{ getChallengeTitle(challengeId) }}</h3>
         <div class="photo-grid">
           <div v-for="photo in photos" :key="photo.id" class="photo-card">
-            <img :alt="photo.description || 'Challenge photo'" class="photo-image" :src="photo.downloadUrl" />
+            <img
+              :alt="photo.description || 'Challenge photo'"
+              class="photo-image"
+              :src="photo.downloadUrl"
+            />
             <div class="photo-info">
-              <p v-if="photo.description" class="photo-description">{{ photo.description }}</p>
+              <p v-if="photo.description" class="photo-description">
+                {{ photo.description }}
+              </p>
               <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
             </div>
           </div>
@@ -53,40 +75,36 @@ meta:
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed } from "vue";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
-import { useEventStore } from "@/stores/eventStore.ts";
 import { useGalleryStore } from "@/stores/galleryStore.ts";
 
-const eventStore = useEventStore();
 const galleryStore = useGalleryStore();
 const challengeStore = useChallengeStore();
 
-const { currentEventId } = storeToRefs(eventStore);
-const { photos, isLoading, error, photosByChallenge, allPhotosSorted } = storeToRefs(galleryStore);
+const { isLoading, error, photosByChallenge, allPhotosSorted } =
+  storeToRefs(galleryStore);
 
 // Function to get challenge title by ID
 const getChallengeTitle = (challengeId: string): string => {
   const challenge = challengeStore.getChallengeById(challengeId);
-  return challenge ? challenge.title : 'Unknown Challenge';
+  return challenge ? challenge.title : "Unknown Challenge";
 };
 
 // Format date for display
 const formatDate = (date: Date): string => {
-  if (!date) return '';
+  if (!date) return "";
 
   // Convert to Date object if it's not already
   const dateObj = date instanceof Date ? date : new Date(date);
 
   return dateObj.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
-
 </script>
 
 <style scoped>
