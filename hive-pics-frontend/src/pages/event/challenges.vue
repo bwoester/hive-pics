@@ -13,6 +13,7 @@ meta:
             :challenge="takePhotoChallenge"
             class="ma-1"
             :prevent-dismiss="true"
+            :upload-progress="uploadProgress[takePhotoChallenge.id] || 0"
             variant="tonal"
             @take-photo="handleTakePhoto"
             @upload-photo="handleUploadPhoto"
@@ -29,6 +30,7 @@ meta:
             <ChallengeCard
               :challenge="challenge"
               class="ma-1"
+              :upload-progress="uploadProgress[challenge.id] || 0"
               @dismiss="handleDismiss"
               @take-photo="handleTakePhoto"
               @upload-photo="handleUploadPhoto"
@@ -123,6 +125,7 @@ const challengeStore = useChallengeStore();
 const { takePhotoChallenge, challenges } = storeToRefs(challengeStore);
 const selectedChallenge = ref<Challenge | null>(null);
 const dismissedChallenges = ref<string[]>([]);
+const uploadProgress = ref<Record<string, number>>({});
 
 const eventStore = useEventStore();
 const { currentEventId } = storeToRefs(eventStore);
@@ -268,13 +271,24 @@ async function handleSubmitPhoto({
   }
 
   try {
+    // Reset progress for this challenge
+    uploadProgress.value[challengeId] = 0;
+
     await eventService.addChallengePhoto(
       userId,
       eventId,
       challengeId,
       imageFile,
       description,
+      (progress) => {
+        uploadProgress.value[challengeId] = progress;
+      },
     );
+
+    // Reset progress after completion
+    setTimeout(() => {
+      uploadProgress.value[challengeId] = 0;
+    }, 1000);
 
     // TODO complete challenge
 

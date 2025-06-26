@@ -1,5 +1,18 @@
 <template>
-  <v-card :variant="challengeCardProps.variant">
+  <v-card
+    :disabled="loading"
+    :loading="loading"
+    :variant="challengeCardProps.variant"
+  >
+    <template #loader="{ isActive }">
+      <v-progress-linear
+        :active="isActive"
+        color="primary"
+        height="4"
+        :model-value="uploadProgress"
+        stream
+      ></v-progress-linear>
+    </template>
     <template #title>
       <div class="d-flex">
         <div class="me-auto text-wrap text-break">
@@ -70,12 +83,16 @@ const challengeCardProps = withDefaults(
     challenge: Challenge;
     variant?: Variant;
     preventDismiss?: boolean;
+    uploadProgress?: number;
   }>(),
   {
     variant: undefined,
     preventDismiss: false,
+    uploadProgress: 0,
   },
 );
+
+const loading = computed(() => challengeCardProps.uploadProgress > 0);
 
 const emit = defineEmits<{
   "take-photo": [challengeId: string];
