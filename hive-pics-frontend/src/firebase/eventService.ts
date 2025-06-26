@@ -17,7 +17,6 @@ import {
 import {
   getDownloadURL,
   ref as storageRef,
-  uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
 import { challengePhotoConverter } from "@/firebase/converters.ts";
@@ -140,7 +139,7 @@ export const eventService = {
     challengeId: string,
     challengePhoto: File,
     description?: string,
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
   ): Promise<ChallengePhoto> {
     if (!challengePhoto) {
       throw new Error("Challenge photo is required");
@@ -170,29 +169,35 @@ export const eventService = {
       storage,
       challengePhotoFilePath,
     );
-    const challengePhotoDownloadURL = await new Promise<string>((resolve, reject) => {
-      const uploadTask = uploadBytesResumable(challengePhotoStorageRef, challengePhoto);
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          onProgress?.(progress);
-        },
-        (error) => reject(error),
-      async () => {
-          try {
-            const url = await getDownloadURL(uploadTask.snapshot.ref);
-            resolve(url);
-          } catch (error) {
-            if (error instanceof Error) {
-              reject(error);
-            } else {
-              reject(new Error("Upload failed: " + JSON.stringify(error)));
+    const challengePhotoDownloadURL = await new Promise<string>(
+      (resolve, reject) => {
+        const uploadTask = uploadBytesResumable(
+          challengePhotoStorageRef,
+          challengePhoto,
+        );
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            onProgress?.(progress);
+          },
+          (error) => reject(error),
+          async () => {
+            try {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            } catch (error) {
+              if (error instanceof Error) {
+                reject(error);
+              } else {
+                reject(new Error("Upload failed: " + JSON.stringify(error)));
+              }
             }
-          }
-        }
-      );
-    });
+          },
+        );
+      },
+    );
 
     // write document
     const challengePhotoDoc: ChallengePhoto = {
