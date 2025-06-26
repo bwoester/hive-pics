@@ -89,8 +89,10 @@ meta:
 
     <ImagePreviewDialog
       ref="imagePreviewDialog"
-      :image-url="selectedImageObjectURL"
+      :image-file="selectedImage"
       :show-description-input="true"
+      @cancel="cancel"
+      @submit="handleSubmitPhoto"
     />
 
     <!-- Snackbar for notifications -->
@@ -111,25 +113,28 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import ChallengeCard from "@/components/challenge/ChallengeCard.vue";
 import ImagePreviewDialog from "@/components/shared/ImagePreviewDialog.vue";
+import { eventService } from "@/firebase/eventService.ts";
+import { useAuthStore } from "@/stores/authStore.ts";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
+import { useEventStore } from "@/stores/eventStore.ts";
 
 const [emblaRef] = emblaCarouselVue({ loop: false });
 const challengeStore = useChallengeStore();
 const { takePhotoChallenge, challenges } = storeToRefs(challengeStore);
+const selectedChallenge = ref<Challenge | null>(null);
 const dismissedChallenges = ref<string[]>([]);
+
+const eventStore = useEventStore();
+const { currentEventId } = storeToRefs(eventStore);
+
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 
 const selectImageInput = ref<HTMLInputElement | null>(null);
 const takeEnvironmentPhotoInput = ref<HTMLInputElement | null>(null);
 const takeUserPhotoInput = ref<HTMLInputElement | null>(null);
 const selectedImage = ref<File | null>(null);
-const selectedImageObjectURL = ref<string | null>(null);
 const imagePreviewDialog = ref<typeof ImagePreviewDialog | null>(null);
-
-onUnmounted(() => {
-  if (selectedImageObjectURL.value) {
-    URL.revokeObjectURL(selectedImageObjectURL.value);
-  }
-});
 
 // Snackbar state
 const snackbar = ref({
@@ -153,6 +158,8 @@ function handleTakePhoto(challengeId: string) {
     return;
   }
 
+  selectedChallenge.value = challenge;
+
   const tags: string[] = challenge.tags;
   const title: string = challenge.title;
   const description: string = challenge.description;
@@ -175,7 +182,17 @@ function handleTakePhoto(challengeId: string) {
   }
 }
 
-function handleUploadPhoto(_challengeId: string) {
+function handleUploadPhoto(challengeId: string) {
+  const challenge: Challenge | null =
+    challengeStore.getChallengeById(challengeId);
+
+  if (!challenge) {
+    showError("Challenge not found: " + challengeId);
+    return;
+  }
+
+  selectedChallenge.value = challenge;
+
   triggerSelectImageInput();
 }
 
@@ -208,21 +225,63 @@ function handleImageInputChange(e: globalThis.Event) {
     return;
   }
 
-  const file: File = target.files[0];
-
-  if (selectedImageObjectURL.value) {
-    URL.revokeObjectURL(selectedImageObjectURL.value);
-  }
-  selectedImage.value = file;
-  selectedImageObjectURL.value = URL.createObjectURL(file);
+  selectedImage.value = target.files[0];
 
   // Open the dialog after setting the image URL
   imagePreviewDialog.value?.showDialog();
 
-  showSuccess("Image preview successfull");
-
   // Reset the file input so the same file can be selected again if needed
   target.value = "";
+}
+
+async function handleSubmitPhoto({
+  imageFile,
+  description,
+}: {
+  imageFile: File | null;
+  description?: string;
+}) {
+  const userId: string | null = user.value?.uid || null;
+
+  if (!userId) {
+    showError("No current user");
+    return;
+  }
+
+  const eventId: string | null = currentEventId.value;
+
+  if (!eventId) {
+    showError("No current event selected");
+    return;
+  }
+
+  const challengeId: string | null = selectedChallenge.value?.id || null;
+
+  if (!challengeId) {
+    showError("No challenge selected");
+    return;
+  }
+
+  if (imageFile === null) {
+    showError("No image selected");
+    return;
+  }
+
+  await eventService.addChallengePhoto(
+    userId,
+    eventId,
+    challengeId,
+    imageFile,
+    description,
+  );
+
+  // TODO complete challenge
+
+  showSuccess("Challenge completed!");
+}
+
+function cancel() {
+  // nothing to do?
 }
 
 function showSuccess(message: string) {

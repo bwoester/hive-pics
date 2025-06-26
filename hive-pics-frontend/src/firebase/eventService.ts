@@ -1,5 +1,12 @@
 import type { Event } from "@shared";
-import type { Unsubscribe } from "firebase/firestore";
+import type { ChallengePhoto } from "@shared/types.ts";
+import type {
+  CollectionReference,
+  DocumentData,
+  DocumentReference,
+  Unsubscribe,
+} from "firebase/firestore";
+import { paths } from "@shared/paths.ts";
 import {
   collection,
   deleteDoc,
@@ -8,7 +15,13 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
-import { db } from "@/firebase/index";
+import {
+  getDownloadURL,
+  ref as storageRef,
+  uploadBytes,
+} from "firebase/storage";
+import { challengePhotoConverter } from "@/firebase/converters.ts";
+import { db, storage } from "@/firebase/index";
 
 export const eventService = {
   /**
@@ -110,5 +123,78 @@ export const eventService = {
 
     const eventDoc = doc(db, `users/${userId}/events/${eventId}`);
     await deleteDoc(eventDoc);
+  },
+
+  challengePhotosCollection(
+    userId: string,
+    eventId: string,
+  ): CollectionReference<ChallengePhoto, DocumentData> {
+    return collection(db, paths.challengePhotos(userId, eventId)).withConverter(
+      challengePhotoConverter,
+    );
+  },
+
+  async addChallengePhoto(
+    userId: string,
+    eventId: string,
+    challengeId: string,
+    challengePhoto: File,
+    description?: string,
+  ): Promise<ChallengePhoto> {
+    if (!challengePhoto) {
+      throw new Error("Challenge photo is required");
+    }
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+    if (!eventId) {
+      throw new Error("Event ID is required");
+    }
+
+    // Add a new document with a generated id
+    const challengePhotoDocRef: DocumentReference<
+      ChallengePhoto,
+      DocumentData
+    > = doc(this.challengePhotosCollection(userId, eventId));
+    const challengePhotoId = challengePhotoDocRef.id;
+
+    // upload image to storage
+    const challengePhotoFilePath = paths.newChallengePhoto(
+      userId,
+      eventId,
+      challengePhotoId,
+      challengePhoto,
+    );
+    const challengePhotoStorageRef = storageRef(
+      storage,
+      challengePhotoFilePath,
+    );
+    let challengePhotoDownloadURL: string;
+    try {
+      const snapshot = await uploadBytes(
+        challengePhotoStorageRef,
+        challengePhoto,
+      );
+      challengePhotoDownloadURL = await getDownloadURL(snapshot.ref);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Failed to upload image");
+    }
+
+    // write document
+    const challengePhotoDoc: ChallengePhoto = {
+      id: challengePhotoId,
+      userId,
+      eventId,
+      challengeId,
+      createdAt: new Date(),
+      description,
+      storagePath: challengePhotoFilePath,
+      downloadUrl: challengePhotoDownloadURL,
+    };
+
+    await setDoc(challengePhotoDocRef, challengePhotoDoc);
+
+    return challengePhotoDoc;
   },
 };

@@ -151,13 +151,14 @@ export const useEventStore = defineStore("event", () => {
   });
 
   return {
-    isEmpty,
+    currentEventId,
     events,
     isLoading,
     error,
     getEventById,
     hasCurrentEventId,
     getCurrentEvent,
+    isEmpty,
     setCurrentEventId,
     clearCurrentEventId,
     subscribeToEvents,

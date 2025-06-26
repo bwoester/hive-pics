@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Using Vuetify's activator slot pattern for showing the dialog -->
-    <v-dialog v-model="dialogVisible" max-width="800px">
+    <v-dialog v-model="dialogVisible" persistent>
       <template #activator="{ props: activatorProps }">
         <slot :activator-props="activatorProps" name="activator"></slot>
       </template>
@@ -12,13 +12,12 @@
         <v-card-text>
           <!-- Image Preview -->
           <div class="image-preview-container">
-            <template v-if="imageUrl">
+            <template v-if="currentObjectURL">
               <v-img
                 class="mx-auto"
                 contain
-                :max-height="500"
-                :max-width="700"
-                :src="imageUrl"
+                max-height="55vh"
+                :src="currentObjectURL"
               ></v-img>
             </template>
             <template v-else>
@@ -34,51 +33,12 @@
           <v-textarea
             v-if="showDescriptionInput"
             v-model="description"
-            auto-grow
             class="mt-4"
             clearable
-            label="Want to add a message to the photo?"
+            label="Want to add a message?"
             rows="2"
             variant="outlined"
           ></v-textarea>
-
-          <!-- Image Editing Controls -->
-          <!--          <v-expansion-panels class="mt-4">-->
-          <!--            <v-expansion-panel title="Image Editing Options">-->
-          <!--              <v-expansion-panel-text>-->
-          <!--                &lt;!&ndash; Cropping Options &ndash;&gt;-->
-          <!--                <div class="mb-4">-->
-          <!--                  <v-subheader>Cropping Options</v-subheader>-->
-          <!--                  <v-btn-group variant="outlined">-->
-          <!--                    <v-btn @click="applyCrop('free')">Free Crop</v-btn>-->
-          <!--                    <v-btn @click="applyCrop('square')">Square</v-btn>-->
-          <!--                    <v-btn @click="applyCrop('16:9')">16:9</v-btn>-->
-          <!--                    <v-btn @click="applyCrop('4:3')">4:3</v-btn>-->
-          <!--                  </v-btn-group>-->
-          <!--                </div>-->
-
-          <!--                &lt;!&ndash; Fitting Options &ndash;&gt;-->
-          <!--                <div class="mb-4">-->
-          <!--                  <v-subheader>Fitting Options</v-subheader>-->
-          <!--                  <v-btn-group variant="outlined">-->
-          <!--                    <v-btn @click="applyFit('fit')">Fit</v-btn>-->
-          <!--                    <v-btn @click="applyFit('fill')">Fill</v-btn>-->
-          <!--                  </v-btn-group>-->
-          <!--                </div>-->
-
-          <!--                &lt;!&ndash; Filter Options &ndash;&gt;-->
-          <!--                <div>-->
-          <!--                  <v-subheader>Filter Options</v-subheader>-->
-          <!--                  <v-btn-group variant="outlined">-->
-          <!--                    <v-btn @click="applyFilter('none')">None</v-btn>-->
-          <!--                    <v-btn @click="applyFilter('grayscale')">Grayscale</v-btn>-->
-          <!--                    <v-btn @click="applyFilter('sepia')">Sepia</v-btn>-->
-          <!--                    <v-btn @click="applyFilter('vivid')">Vivid</v-btn>-->
-          <!--                  </v-btn-group>-->
-          <!--                </div>-->
-          <!--              </v-expansion-panel-text>-->
-          <!--            </v-expansion-panel>-->
-          <!--          </v-expansion-panels>-->
         </v-card-text>
 
         <v-card-actions>
@@ -137,17 +97,46 @@
 import { ref, watch } from "vue";
 
 const props = defineProps<{
-  imageUrl: string | null;
+  imageFile: File | null;
   showDescriptionInput?: boolean;
 }>();
 
 const emit = defineEmits<{
-  submit: [{ imageUrl: string | null; description?: string }];
+  submit: [{ imageFile: File | null; description?: string }];
   cancel: [];
 }>();
 
 const dialogVisible = ref(false);
 const description = ref("");
+
+// Create a ref to store the current object URL
+const currentObjectURL = ref<string | null>(null);
+
+// Watch for changes in the file and handle object URL creation/cleanup
+watch(
+  () => props.imageFile,
+  (newFile) => {
+    // Clean up the previous object URL if it exists
+    if (currentObjectURL.value) {
+      URL.revokeObjectURL(currentObjectURL.value);
+      currentObjectURL.value = null;
+    }
+
+    // Create a new object URL if we have a file
+    if (newFile) {
+      currentObjectURL.value = URL.createObjectURL(newFile);
+    }
+  },
+  { immediate: true },
+);
+
+// Clean up on unmounting
+onUnmounted(() => {
+  if (currentObjectURL.value) {
+    URL.revokeObjectURL(currentObjectURL.value);
+    currentObjectURL.value = null;
+  }
+});
 
 // Method to show the dialog programmatically
 function showDialog() {
@@ -166,27 +155,10 @@ watch(dialogVisible, (newValue) => {
   }
 });
 
-// Stub methods for image editing features
-// These would be implemented with actual image editing libraries
-// function applyCrop(cropType: string) {
-//   console.log(`Applying crop: ${cropType}`);
-//   // In a real implementation, this would apply the crop to the image
-// }
-
-// function applyFit(fitType: string) {
-//   console.log(`Applying fit: ${fitType}`);
-//   // In a real implementation, this would apply the fit to the image
-// }
-
-// function applyFilter(filterType: string) {
-//   console.log(`Applying filter: ${filterType}`);
-//   // In a real implementation, this would apply the filter to the image
-// }
-
-// Submit the image with optional description
+// Submit the image with the optional description
 function submit() {
   emit("submit", {
-    imageUrl: props.imageUrl,
+    imageFile: props.imageFile,
     description: props.showDescriptionInput ? description.value : undefined,
   });
   hideDialog();

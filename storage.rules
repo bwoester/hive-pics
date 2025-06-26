@@ -9,11 +9,18 @@ service firebase.storage {
         // ✅ Anyone can read event coverImages
         // ✅ Hosts can upload event coverImages to their events
         // ✅ Hosts can delete event coverImages from their events
-        match /users/{userId}/events/{eventId}/{imageId} {
+        match /users/{userId}/events/{eventId}/cover-images/{imageId} {
             allow read: if true;
             allow create, update: if request.auth.uid == userId
                 && request.resource.contentType.matches('image/.*');
             allow delete: if request.auth.uid == userId;
+        }
+
+        // ✅ Anyone can read challenge-photos
+        // ✅ Anyone can create challenge-photos
+        match /users/{userId}/events/{eventId}/challenge-photos/{imageId} {
+            allow read: if true;
+            allow create: if request.resource.contentType.matches('image/.*');
         }
 
         // ❌ Default deny for everything else

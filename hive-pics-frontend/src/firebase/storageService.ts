@@ -17,9 +17,8 @@ export const storageService = {
   async uploadImage(
     file: File,
     metadata: {
-      useCase: "event-cover" | "challenge" | "profile" | string;
-      id: string;
-      additionalId?: string;
+      useCase: "event-cover" | "challenge" | string;
+      eventId: string;
     },
   ): Promise<string> {
     if (!auth.currentUser) {
@@ -28,43 +27,31 @@ export const storageService = {
 
     const userId = auth.currentUser.uid;
     let folderPath = "";
-    let filePrefix = "";
 
     // Determine folder path and file prefix based on use case
     switch (metadata.useCase) {
       case "event-cover": {
-        folderPath = `users/${userId}/events/${metadata.id}`;
-        filePrefix = "cover-image";
+        folderPath = `users/${userId}/events/${metadata.eventId}/cover-images`;
         // Delete old cover images before uploading new one
         await this.deleteImages({
           useCase: "event-cover",
-          id: metadata.id,
+          id: metadata.eventId,
         });
         break;
       }
       case "challenge": {
-        folderPath = `users/${userId}/challenges/${metadata.id}`;
-        filePrefix = "challenge-photo";
-        break;
-      }
-      case "profile": {
-        folderPath = `users/${userId}/profile`;
-        filePrefix = "profile-photo";
+        folderPath = `users/${userId}/events/${metadata.eventId}/challenge-photos`;
         break;
       }
       default: {
         // For custom use cases
-        folderPath = `users/${userId}/${metadata.useCase}/${metadata.id}`;
-        filePrefix = metadata.useCase;
-        if (metadata.additionalId) {
-          folderPath += `/${metadata.additionalId}`;
-        }
+        folderPath = `users/${userId}/events/${metadata.eventId}/${metadata.useCase}`;
       }
     }
 
     const timestamp = Date.now();
     const extension = file.name.split(".").pop()?.toLowerCase() || "unknown";
-    const fileName = `${filePrefix}_${timestamp}.${extension}`;
+    const fileName = `${timestamp}.${extension}`;
     const imageRef = storageRef(storage, `${folderPath}/${fileName}`);
 
     try {
@@ -88,7 +75,7 @@ export const storageService = {
   async uploadEventCoverImage(file: File, eventId: string): Promise<string> {
     return this.uploadImage(file, {
       useCase: "event-cover",
-      id: eventId,
+      eventId,
     });
   },
 
@@ -99,15 +86,10 @@ export const storageService = {
    * @param eventId - Optional ID of the associated event
    * @returns Promise with the download URL of the uploaded image
    */
-  async uploadChallengePhoto(
-    file: File,
-    challengeId: string,
-    eventId?: string,
-  ): Promise<string> {
+  async uploadChallengePhoto(file: File, eventId: string): Promise<string> {
     return this.uploadImage(file, {
       useCase: "challenge",
-      id: challengeId,
-      additionalId: eventId,
+      eventId,
     });
   },
 
@@ -117,7 +99,7 @@ export const storageService = {
    * @returns Promise with the number of deleted images
    */
   async deleteImages(metadata: {
-    useCase: "event-cover" | "challenge" | "profile" | string;
+    useCase: "event-cover" | "challenge" | string;
     id: string;
     additionalId?: string;
     filePrefix?: string;
@@ -133,18 +115,13 @@ export const storageService = {
     // Determine folder path and file prefix based on use case
     switch (metadata.useCase) {
       case "event-cover": {
-        folderPath = `users/${userId}/events/${metadata.id}`;
-        filePrefix = "cover-image";
+        folderPath = `users/${userId}/events/${metadata.id}/cover-images`;
+        filePrefix = "";
         break;
       }
       case "challenge": {
-        folderPath = `users/${userId}/challenges/${metadata.id}`;
-        filePrefix = "challenge-photo";
-        break;
-      }
-      case "profile": {
-        folderPath = `users/${userId}/profile`;
-        filePrefix = "profile-photo";
+        folderPath = `users/${userId}/events/${metadata.id}/challenge-photos`;
+        filePrefix = "";
         break;
       }
       default: {
