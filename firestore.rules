@@ -3,9 +3,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // =========================
-    // HOST USER DOCUMENTS
-    // =========================
+    // # HOST USER DOCUMENTS
+
     match /users/{userId} {
       // Allow users to read their own data
       allow read: if request.auth.uid == userId;
@@ -24,9 +23,8 @@ service cloud.firestore {
       // Prevent delete from client
       allow delete: if false;
 
-      // =========================
-      // EVENTS CREATED BY HOST
-      // =========================
+      // ## EVENTS CREATED BY HOST
+
       match /events/{eventId} {
         // Hosts can read/write
         allow read, write: if request.auth.uid == userId;
@@ -34,26 +32,17 @@ service cloud.firestore {
         // Guests can read public event info
         allow get: if request.auth == null || request.auth.uid != userId;
 
-        // =========================
-        // GUEST UPLOADS
-        // =========================
-        match /uploads/{uploadId} {
-          // Allow guests to create an upload
-          allow create: if true;
+        // ### CHALLENGE PHOTOS
 
-          // Only the host can read/delete uploads
-          allow read, delete: if request.auth.uid == userId;
+        match /challenge-photos/{challengePhotoId} {
+          // Guests can upload and read
+          allow create, read: if true;
 
-          // Prevent overwrite of existing uploads
+          // Nobody is allowed to update
           allow update: if false;
-        }
 
-        // =========================
-        // GUEST METADATA (e.g. name, session, etc.)
-        // =========================
-        match /guests/{guestId} {
-          // Guests can self-register (e.g. join via QR code)
-          allow create: if true;
+          // Only the host can delete uploads
+          allow delete: if request.auth.uid == userId;
         }
       }
 

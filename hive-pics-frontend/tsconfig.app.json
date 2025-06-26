@@ -14,8 +14,8 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared": ["../functions/src/shared"],
-      "@shared/*": ["../functions/src/shared/*"]
+      "@shared/*": ["../functions/src/shared/*"],
+      "@shared": ["../functions/src/shared"]
     }
   }
 }

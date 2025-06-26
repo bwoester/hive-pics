@@ -1,12 +1,11 @@
-import type { Event } from "@shared";
-import type { ChallengePhoto } from "@shared/types.ts";
+import type { ChallengePhoto, Event } from "@shared";
 import type {
   CollectionReference,
   DocumentData,
   DocumentReference,
   Unsubscribe,
 } from "firebase/firestore";
-import { paths } from "@shared/paths.ts";
+import { paths } from "@shared";
 import {
   collection,
   deleteDoc,
@@ -193,7 +192,12 @@ export const eventService = {
       downloadUrl: challengePhotoDownloadURL,
     };
 
-    await setDoc(challengePhotoDocRef, challengePhotoDoc);
+    try {
+      await setDoc(challengePhotoDocRef, challengePhotoDoc);
+    } catch (error) {
+      console.error("Error storing challengePhotoDoc:", error);
+      throw new Error("Failed to store challengePhotoDoc");
+    }
 
     return challengePhotoDoc;
   },

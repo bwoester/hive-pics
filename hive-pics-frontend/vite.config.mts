@@ -71,6 +71,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("src", import.meta.url)),
+      "@shared/*": fileURLToPath(
+        new URL("../functions/src/shared/*", import.meta.url),
+      ),
+      "@shared": fileURLToPath(
+        new URL("../functions/src/shared", import.meta.url),
+      ),
     },
     extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
   },

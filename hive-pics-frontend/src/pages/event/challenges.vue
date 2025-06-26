@@ -267,17 +267,22 @@ async function handleSubmitPhoto({
     return;
   }
 
-  await eventService.addChallengePhoto(
-    userId,
-    eventId,
-    challengeId,
-    imageFile,
-    description,
-  );
+  try {
+    await eventService.addChallengePhoto(
+      userId,
+      eventId,
+      challengeId,
+      imageFile,
+      description,
+    );
 
-  // TODO complete challenge
+    // TODO complete challenge
 
-  showSuccess("Challenge completed!");
+    showSuccess("Challenge completed!");
+  } catch (error) {
+    showError("Error submitting challenge: " + error);
+  }
+
 }
 
 function cancel() {
