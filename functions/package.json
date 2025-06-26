@@ -4,6 +4,7 @@
     "format": "prettier . --write",
     "lint": "eslint . --fix",
     "test": "mocha",
+    "prebuild": "npm run format && npm run lint",
     "build": "tsup",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
