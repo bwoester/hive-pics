@@ -1,12 +1,19 @@
 <template>
+
+  <!-- Top App Bar -->
   <AppHeader />
 
-  <v-main>
-    <router-view />
+  <!-- Main Content -->
+  <v-main class="d-flex flex-column">
+    <v-container class="flex-grow-1">
+      <router-view />
+    </v-container>
+
+    <!-- Footer inside v-main, above bottom nav -->
+    <AppFooter />
   </v-main>
 
-  <AppFooter class="mb-14" />
-
+  <!-- Bottom Navigation -->
   <v-bottom-navigation>
     <v-btn to="/event/challenges" value="challenges">
       <v-icon>mdi-camera-party-mode</v-icon>
