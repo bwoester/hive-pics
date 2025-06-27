@@ -9,7 +9,7 @@ export type FabOptions = {
 
 const DEFAULT_FAB_OPTIONS: Partial<FabOptions> = {
   active: true,
-  elevation: 8
+  elevation: 8,
 };
 
 const fabState = ref<FabOptions | null>(null);
@@ -21,7 +21,7 @@ export function useFab() {
       // Merge the provided options with defaults
       fabState.value = {
         ...DEFAULT_FAB_OPTIONS,
-        ...options
+        ...options,
       };
     }, 100); // 100ms delay for entering
   }

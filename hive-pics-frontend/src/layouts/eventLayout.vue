@@ -46,5 +46,4 @@ import { useFab } from "@/composables/useFab";
 const { fabState } = useFab();
 </script>
 
-<style scoped lang="sass">
-</style>
+<style scoped lang="sass"></style>
