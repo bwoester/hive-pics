@@ -5,8 +5,6 @@ meta:
 
 <template>
   <div class="gallery-page fill-height">
-    <h1>Gallery</h1>
-
     <div v-if="isLoading" class="loading-container">
       <v-progress-circular color="primary" indeterminate />
       <p>Loading photos...</p>
@@ -22,39 +20,14 @@ meta:
     </div>
 
     <div v-else class="gallery-container">
-      <h2>All Photos</h2>
-      <div class="photo-grid">
-        <div
-          v-for="photo in allPhotosSorted"
-          :key="photo.id"
-          class="photo-card"
-        >
-          <img
-            :alt="photo.description || 'Challenge photo'"
-            class="photo-image"
-            :src="photo.downloadUrl"
-          />
-          <div class="photo-info">
-            <p v-if="photo.description" class="photo-description">
-              {{ photo.description }}
-            </p>
-            <p class="photo-challenge">
-              {{ getChallengeTitle(photo.challengeId) }}
-            </p>
-            <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
-          </div>
-        </div>
-      </div>
-
-      <h2 class="section-title">Photos by Challenge</h2>
-      <div
-        v-for="(photos, challengeId) in photosByChallenge"
-        :key="challengeId"
-        class="challenge-section"
-      >
-        <h3>{{ getChallengeTitle(challengeId) }}</h3>
+      <!-- No grouping - show all photos -->
+      <template v-if="groupingOption === 'none'">
         <div class="photo-grid">
-          <div v-for="photo in photos" :key="photo.id" class="photo-card">
+          <div
+            v-for="photo in allPhotosSorted"
+            :key="photo.id"
+            class="photo-card"
+          >
             <img
               :alt="photo.description || 'Challenge photo'"
               class="photo-image"
@@ -64,17 +37,80 @@ meta:
               <p v-if="photo.description" class="photo-description">
                 {{ photo.description }}
               </p>
+              <p class="photo-challenge">
+                {{ getChallengeTitle(photo.challengeId) }}
+              </p>
               <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
             </div>
           </div>
         </div>
-      </div>
+      </template>
+
+      <!-- Group by challenge -->
+      <template v-else-if="groupingOption === 'challenge'">
+        <div
+          v-for="(photos, challengeId) in photosByGroup"
+          :key="challengeId"
+          class="challenge-section"
+        >
+          <h3>{{ getChallengeTitle(challengeId) }}</h3>
+          <div class="photo-grid">
+            <div v-for="photo in photos" :key="photo.id" class="photo-card">
+              <img
+                :alt="photo.description || 'Challenge photo'"
+                class="photo-image"
+                :src="photo.downloadUrl"
+              />
+              <div class="photo-info">
+                <p v-if="photo.description" class="photo-description">
+                  {{ photo.description }}
+                </p>
+                <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Group by author -->
+      <template v-else-if="groupingOption === 'author'">
+        <div
+          v-for="(photos, authorId) in photosByGroup"
+          :key="authorId"
+          class="author-section"
+        >
+          <h3>{{ getAuthorName(authorId) }}</h3>
+          <div class="photo-grid">
+            <div v-for="photo in photos" :key="photo.id" class="photo-card">
+              <img
+                :alt="photo.description || 'Challenge photo'"
+                class="photo-image"
+                :src="photo.downloadUrl"
+              />
+              <div class="photo-info">
+                <p v-if="photo.description" class="photo-description">
+                  {{ photo.description }}
+                </p>
+                <p class="photo-challenge">
+                  {{ getChallengeTitle(photo.challengeId) }}
+                </p>
+                <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
     </div>
+
+    <!-- Gallery filter bottom sheet -->
+    <GalleryFilterBottomSheet v-model="isBottomSheetOpen" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { ref } from "vue";
+import GalleryFilterBottomSheet from "@/components/GalleryFilterBottomSheet.vue";
 import { useFab } from "@/composables/useFab";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 import { useGalleryStore } from "@/stores/galleryStore.ts";
@@ -84,11 +120,14 @@ const { setFabState, clearFabState } = useFab();
 const galleryStore = useGalleryStore();
 const challengeStore = useChallengeStore();
 
-const { isLoading, error, photosByChallenge, allPhotosSorted } =
+const { isLoading, error, photosByGroup, allPhotosSorted, groupingOption } =
   storeToRefs(galleryStore);
 
+// Bottom sheet state
+const isBottomSheetOpen = ref(false);
+
 function handleFabClick() {
-  console.log("clicked fab");
+  isBottomSheetOpen.value = true;
 }
 
 onMounted(() => {
@@ -106,6 +145,12 @@ onBeforeUnmount(() => {
 const getChallengeTitle = (challengeId: string): string => {
   const challenge = challengeStore.getChallengeById(challengeId);
   return challenge ? challenge.title : "Unknown Challenge";
+};
+
+// Function to get author name by ID
+const getAuthorName = (authorId: string): string => {
+  // This is a placeholder. In a real app, you would fetch the author's name from a user store
+  return authorId === "unknown" ? "Unknown Author" : `Author ${authorId}`;
 };
 
 // Format date for display

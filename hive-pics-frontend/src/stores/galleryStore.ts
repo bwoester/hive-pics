@@ -8,12 +8,22 @@ import { eventService } from "@/firebase/eventService.ts";
 import { useAuthStore } from "@/stores/authStore.ts";
 import { useEventStore } from "@/stores/eventStore.ts";
 
+// Types for gallery filtering and sorting
+export type GalleryGroupingOption = "none" | "author" | "challenge";
+export type GallerySortingOption = "createdAt" | "likes";
+export type GallerySortingDirection = "asc" | "desc";
+
 export const useGalleryStore = defineStore("gallery", () => {
   const photos = ref<ChallengePhoto[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const eventStore = useEventStore();
   const authStore = useAuthStore();
+
+  // Gallery filtering and sorting options
+  const groupingOption = ref<GalleryGroupingOption>("none");
+  const sortingOption = ref<GallerySortingOption>("createdAt");
+  const sortingDirection = ref<GallerySortingDirection>("desc");
 
   // Keep track of active subscriptions
   let photosUnsubscribe: Unsubscribe | null = null;
@@ -27,8 +37,53 @@ export const useGalleryStore = defineStore("gallery", () => {
     return photos.value.filter((photo) => photo.challengeId === challengeId);
   });
 
-  // Group photos by challenge
+  // Group photos based on selected grouping option
+  const photosByGroup = computed(() => {
+    const grouped: Record<string, ChallengePhoto[]> = {};
+
+    switch (groupingOption.value) {
+      case "none": {
+        grouped["all"] = [...photos.value];
+        break;
+      }
+      case "challenge": {
+        // Group by challenge
+        for (const photo of photos.value) {
+          if (!grouped[photo.challengeId]) {
+            grouped[photo.challengeId] = [];
+          }
+          grouped[photo.challengeId].push(photo);
+        }
+        break;
+      }
+      case "author": {
+        // Group by author
+        for (const photo of photos.value) {
+          const authorId = photo.userId || "unknown";
+          if (!grouped[authorId]) {
+            grouped[authorId] = [];
+          }
+          grouped[authorId].push(photo);
+        }
+        break;
+      }
+    }
+
+    // Sort photos within each group
+    for (const groupId of Object.keys(grouped)) {
+      grouped[groupId] = sortPhotos(grouped[groupId]);
+    }
+
+    return grouped;
+  });
+
+  // For backward compatibility
   const photosByChallenge = computed(() => {
+    if (groupingOption.value === "challenge") {
+      return photosByGroup.value;
+    }
+
+    // Create a challenge-grouped view even if that's not the current grouping
     const grouped: Record<string, ChallengePhoto[]> = {};
 
     for (const photo of photos.value) {
@@ -38,24 +93,35 @@ export const useGalleryStore = defineStore("gallery", () => {
       grouped[photo.challengeId].push(photo);
     }
 
-    // Sort photos within each group by createdAt (newest first)
+    // Sort photos within each group
     for (const challengeId of Object.keys(grouped)) {
-      grouped[challengeId].sort((a, b) => {
-        return (
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      });
+      grouped[challengeId] = sortPhotos(grouped[challengeId]);
     }
 
     return grouped;
   });
 
-  // All photos sorted by createdAt (newest first)
+  // All photos sorted according to current sorting options
   const allPhotosSorted = computed(() => {
-    return [...photos.value].sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+    return sortPhotos([...photos.value]);
   });
+
+  // Helper function to sort photos based on current sorting options
+  function sortPhotos(photosToSort: ChallengePhoto[]): ChallengePhoto[] {
+    return [...photosToSort].sort((a, b) => {
+      let comparison = 0;
+
+      if (sortingOption.value === "createdAt") {
+        comparison = b.createdAt.getTime() - a.createdAt.getTime();
+      } else if (sortingOption.value === "likes") {
+        // TODO likes not yet counted
+        // comparison = (b.likes || 0) - (a.likes || 0);
+      }
+
+      // Reverse the comparison if sorting direction is ascending
+      return sortingDirection.value === "asc" ? -comparison : comparison;
+    });
+  }
 
   // Actions
   function subscribeToPhotos() {
@@ -110,6 +176,19 @@ export const useGalleryStore = defineStore("gallery", () => {
     }
   }
 
+  // Methods to set gallery filtering and sorting options
+  function setGroupingOption(option: GalleryGroupingOption) {
+    groupingOption.value = option;
+  }
+
+  function setSortingOption(option: GallerySortingOption) {
+    sortingOption.value = option;
+  }
+
+  function setSortingDirection(direction: GallerySortingDirection) {
+    sortingDirection.value = direction;
+  }
+
   // Watch for changes in the current event ID
   watch(
     () => eventStore.currentEventId,
@@ -131,8 +210,16 @@ export const useGalleryStore = defineStore("gallery", () => {
     getPhotoById,
     getPhotosByChallengeId,
     photosByChallenge,
+    photosByGroup,
     allPhotosSorted,
     subscribeToPhotos,
     unsubscribeFromPhotos,
+    // Grouping and sorting options
+    groupingOption,
+    sortingOption,
+    sortingDirection,
+    setGroupingOption,
+    setSortingOption,
+    setSortingDirection,
   };
 });
