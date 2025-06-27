@@ -88,7 +88,7 @@ const { isLoading, error, photosByChallenge, allPhotosSorted } =
   storeToRefs(galleryStore);
 
 function handleFabClick() {
-  alert("FAB clicked!");
+  console.log("clicked fab")
 }
 
 onMounted(() => {

@@ -30,11 +30,12 @@
 
   <!-- FAB: Only rendered if defined -->
   <v-fab
-    v-if="fabState"
+    v-show="!!fabState"
+    :active="fabState?.active ?? false"
     app
-    elevation="8"
-    :icon="fabState.icon"
-    @click="fabState.onClick"
+    :elevation="fabState?.elevation ?? 8"
+    :icon="fabState?.icon ?? 'mdi-filter-variant'"
+    @click="fabState?.onClick"
   >
   </v-fab>
 </template>
@@ -45,4 +46,5 @@ import { useFab } from "@/composables/useFab";
 const { fabState } = useFab();
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+</style>
