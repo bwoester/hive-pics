@@ -1,5 +1,4 @@
 <template>
-
   <!-- Top App Bar -->
   <AppHeader />
 
@@ -14,7 +13,7 @@
   </v-main>
 
   <!-- Bottom Navigation -->
-  <v-bottom-navigation>
+  <v-bottom-navigation app>
     <v-btn to="/event/challenges" value="challenges">
       <v-icon>mdi-camera-party-mode</v-icon>
       <span>Challenges</span>
@@ -28,10 +27,22 @@
       <span>Ranks</span>
     </v-btn>
   </v-bottom-navigation>
+
+  <!-- FAB: Only rendered if defined -->
+  <v-fab
+    v-if="fabState"
+    app
+    elevation="8"
+    :icon="fabState.icon"
+    @click="fabState.onClick"
+  >
+  </v-fab>
 </template>
 
 <script lang="ts" setup>
-// nop
+import { useFab } from "@/composables/useFab";
+
+const { fabState } = useFab();
 </script>
 
 <style scoped lang="sass"></style>

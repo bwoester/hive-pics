@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="primary" scroll-behavior="hide">
+  <v-app-bar app color="primary" scroll-behavior="hide">
     <!-- Logo and AppName as link to landing page -->
     <template #prepend>
       <router-link class="mr-4 text-white" to="/" @click="handleLogoClick">

@@ -4,7 +4,7 @@ meta:
 </route>
 
 <template>
-  <div class="gallery-page">
+  <div class="gallery-page fill-height">
     <h1>Gallery</h1>
 
     <div v-if="isLoading" class="loading-container">
@@ -75,14 +75,32 @@ meta:
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { useFab } from "@/composables/useFab";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
 import { useGalleryStore } from "@/stores/galleryStore.ts";
+
+const { setFabState, clearFabState } = useFab();
 
 const galleryStore = useGalleryStore();
 const challengeStore = useChallengeStore();
 
 const { isLoading, error, photosByChallenge, allPhotosSorted } =
   storeToRefs(galleryStore);
+
+function handleFabClick() {
+  alert("FAB clicked!");
+}
+
+onMounted(() => {
+  setFabState({
+    icon: "mdi-filter-variant",
+    onClick: handleFabClick,
+  });
+});
+
+onBeforeUnmount(() => {
+  clearFabState();
+});
 
 // Function to get challenge title by ID
 const getChallengeTitle = (challengeId: string): string => {
