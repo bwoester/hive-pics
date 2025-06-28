@@ -4,7 +4,8 @@ meta:
 </route>
 
 <template>
-  <div class="gallery-page fill-height">
+  <!-- TODO check material design 3 about left/right padding -->
+  <div class="fill-height pa-2">
     <div v-if="isLoading" class="loading-container">
       <v-progress-circular color="primary" indeterminate />
       <p>Loading photos...</p>
@@ -54,18 +55,22 @@ meta:
           class="challenge-section"
         >
           <h3>{{ getChallengeTitle(challengeId) }}</h3>
-          <div class="photo-grid">
-            <div v-for="photo in photos" :key="photo.id" class="photo-card">
-              <img
-                :alt="photo.description || 'Challenge photo'"
-                class="photo-image"
-                :src="photo.downloadUrl"
-              />
-              <div class="photo-info">
-                <p v-if="photo.description" class="photo-description">
-                  {{ photo.description }}
-                </p>
-                <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
+          <div :ref="setCarouselRef(challengeId)" class="embla">
+            <div class="embla__container">
+              <div v-for="photo in photos" :key="photo.id" class="embla__slide">
+                <div class="photo-card ma-1">
+                  <img
+                    :alt="photo.description || 'Challenge photo'"
+                    class="photo-image"
+                    :src="photo.downloadUrl"
+                  />
+                  <div class="photo-info">
+                    <p v-if="photo.description" class="photo-description">
+                      {{ photo.description }}
+                    </p>
+                    <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -80,21 +85,22 @@ meta:
           class="author-section"
         >
           <h3>{{ getAuthorName(authorId) }}</h3>
-          <div class="photo-grid">
-            <div v-for="photo in photos" :key="photo.id" class="photo-card">
-              <img
-                :alt="photo.description || 'Challenge photo'"
-                class="photo-image"
-                :src="photo.downloadUrl"
-              />
-              <div class="photo-info">
-                <p v-if="photo.description" class="photo-description">
-                  {{ photo.description }}
-                </p>
-                <p class="photo-challenge">
-                  {{ getChallengeTitle(photo.challengeId) }}
-                </p>
-                <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
+          <div :ref="setCarouselRef(authorId)" class="embla">
+            <div class="embla__container">
+              <div v-for="photo in photos" :key="photo.id" class="embla__slide">
+                <div class="photo-card ma-1">
+                  <img
+                    :alt="photo.description || 'Challenge photo'"
+                    class="photo-image"
+                    :src="photo.downloadUrl"
+                  />
+                  <div class="photo-info">
+                    <p v-if="photo.description" class="photo-description">
+                      {{ photo.description }}
+                    </p>
+                    <p class="photo-date">{{ formatDate(photo.createdAt) }}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -108,8 +114,10 @@ meta:
 </template>
 
 <script setup lang="ts">
+import type { EmblaCarouselType } from "embla-carousel";
+import EmblaCarousel from "embla-carousel";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import GalleryFilterBottomSheet from "@/components/GalleryFilterBottomSheet.vue";
 import { useFab } from "@/composables/useFab";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
@@ -122,6 +130,13 @@ const challengeStore = useChallengeStore();
 
 const { isLoading, error, photosByGroup, allPhotosSorted, groupingOption } =
   storeToRefs(galleryStore);
+
+// Create embla carousel refs for each group
+type EmblaInfo = {
+  elementRef: HTMLElement;
+  api: EmblaCarouselType;
+};
+const carouselRefs = ref<Record<string, EmblaInfo>>({});
 
 // Bottom sheet state
 const isBottomSheetOpen = ref(false);
@@ -140,6 +155,37 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearFabState();
 });
+
+// Helper: Vue template refs don’t play nicely with dynamic keys, so we use a function.
+function setCarouselRef(groupId: string) {
+  return (elementRef: Element | ComponentPublicInstance | null) => {
+    if (elementRef instanceof HTMLElement) {
+      if (!Object.keys(carouselRefs.value).includes(groupId)) {
+        const options = { loop: false };
+        const emblaApi = EmblaCarousel(elementRef, options);
+        carouselRefs.value[groupId] = {
+          elementRef,
+          api: emblaApi,
+        };
+      }
+    } else if (
+      elementRef === null &&
+      Object.keys(carouselRefs.value).includes(groupId)
+    ) {
+      delete carouselRefs.value[groupId];
+    }
+  };
+}
+
+// Watch for changes in group keys to update ref map
+// watch(photosByGroup, async () => {
+//   await nextTick()
+//   // clean up refs for removed groups
+//   const keys = Object.keys(photosByGroup.value)
+//   for (const key of Object.keys(carouselRefs.value)) {
+//     if (!keys.includes(key)) delete carouselRefs.value[key]
+//   }
+// }, { deep: true })
 
 // Function to get challenge title by ID
 const getChallengeTitle = (challengeId: string): string => {
@@ -171,10 +217,6 @@ const formatDate = (date: Date): string => {
 </script>
 
 <style scoped>
-.gallery-page {
-  padding: 1rem;
-}
-
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -258,7 +300,22 @@ const formatDate = (date: Date): string => {
   font-size: 0.8rem;
 }
 
-.challenge-section {
+.challenge-section,
+.author-section {
   margin-bottom: 2rem;
+}
+
+.embla {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+}
+
+.embla__slide {
+  flex: 0 0 90%;
+  min-width: 0;
+  /*margin-right: 1rem;*/
 }
 </style>

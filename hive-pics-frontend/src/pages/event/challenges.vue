@@ -4,7 +4,8 @@ meta:
 </route>
 
 <template>
-  <v-container class="d-flex align-center justify-center fill-height">
+  <!-- TODO check material design 3 about left/right padding -->
+  <v-container class="d-flex align-center justify-center fill-height pa-2">
     <div ref="emblaRef" class="embla">
       <div class="embla__container">
         <!-- Simple, static "take photo" challenge -->

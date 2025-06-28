@@ -5,6 +5,7 @@ import type {
   DocumentReference,
   Unsubscribe,
 } from "firebase/firestore";
+import type { UploadMetadata } from "firebase/storage";
 import { paths } from "@shared";
 import {
   collection,
@@ -169,11 +170,15 @@ export const eventService = {
       storage,
       challengePhotoFilePath,
     );
+    const metadata: UploadMetadata = {
+      cacheControl: "private, max-age=86400, immutable",
+    };
     const challengePhotoDownloadURL = await new Promise<string>(
       (resolve, reject) => {
         const uploadTask = uploadBytesResumable(
           challengePhotoStorageRef,
           challengePhoto,
+          metadata,
         );
         uploadTask.on(
           "state_changed",

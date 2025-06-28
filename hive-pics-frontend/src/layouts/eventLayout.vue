@@ -4,7 +4,7 @@
 
   <!-- Main Content -->
   <v-main class="d-flex flex-column">
-    <v-container class="flex-grow-1">
+    <v-container class="flex-grow-1 pa-0">
       <router-view />
     </v-container>
 
