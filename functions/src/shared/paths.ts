@@ -30,11 +30,10 @@ export const paths = {
     challengePhotoDocId: string,
     challengePhoto: File,
   ): string => {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const extension =
       challengePhoto.name.split(".").pop()?.toLowerCase() ?? "unknown";
     const normalizedExtension = extension === "jpg" ? "jpeg" : extension;
-    const challengePhotoFileName = `${timestamp}-${challengePhotoDocId}.${normalizedExtension}`;
+    const challengePhotoFileName = `${challengePhotoDocId}.${normalizedExtension}`;
     return paths.challengePhoto(userId, eventId, challengePhotoFileName);
   },
 };
