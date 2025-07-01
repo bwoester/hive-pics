@@ -15,9 +15,11 @@ const ImageResizedEvent = z.looseObject({
     // https://github.com/firebase/extensions/blob/2f23c5a7efa657aca8ee7b24f9809644687d5c08/storage-resize-images/functions/src/resize-image.ts#L15
     outputs: z.array(
       z.looseObject({
-        size: z.string(),
-        outputFilePath: z.string(),
-        success: z.boolean(),
+        value: z.looseObject({
+          size: z.string(),
+          outputFilePath: z.string(),
+          success: z.boolean(),
+        })
       }),
     ),
   }),
@@ -65,11 +67,11 @@ export const onImageResized = onCustomEventPublished(
       // Generate information about resized images
       const resizedImagesInfo = await Promise.all(
         imageResizedEvent.data.outputs
-          .filter((i) => i.success)
+          .filter((i) => i.value.success)
           .map((i) => {
             return {
-              size: i.size,
-              storagePath: i.outputFilePath,
+              size: i.value.size,
+              storagePath: i.value.outputFilePath,
             };
           }),
       );
