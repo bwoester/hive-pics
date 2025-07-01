@@ -11,5 +11,5 @@ export interface ChallengePhoto {
   createdAt: Date;
   description?: string;
   storagePath: string;
-  resized: ResizedImage[]
+  resized: ResizedImage[];
 }
