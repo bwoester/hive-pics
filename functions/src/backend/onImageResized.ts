@@ -19,7 +19,7 @@ const ImageResizedEvent = z.looseObject({
           size: z.string(),
           outputFilePath: z.string(),
           success: z.boolean(),
-        })
+        }),
       }),
     ),
   }),
