@@ -1,8 +1,9 @@
-import * as functions from "firebase-functions";
 import { onCustomEventPublished } from "firebase-functions/v2/eventarc";
 import * as z from "zod/v4-mini";
 import { HttpsError } from "firebase-functions/https";
-import {getFirestore} from "firebase-admin/firestore";
+import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
+import { ChallengePhoto } from "../shared/types";
 
 const ImageResizedEvent = z.object({
   data: z.object({
@@ -42,16 +43,46 @@ export const onImageResized = onCustomEventPublished(
       throw new HttpsError("invalid-argument", validation.error.message);
     } else {
       const imageResizedEvent = validation.data;
-
-      const db = getFirestore();
       // full file path in the bucket (absolute path, file name, file ext)
       const originalImageFilePath = imageResizedEvent.data.input.name;
-      // full path in firestore (same as file path in bucket, but file ext removed)
+      // full path in firestore (same as the file path in bucket, but file ext removed)
       const docPath = originalImageFilePath.substring(0, originalImageFilePath.lastIndexOf('.'));
+      const db = getFirestore();
       const docRef = db.doc(docPath);
 
+      // Check if the document exists
+      return docRef.get().then(async (doc) => {
+        if (!doc.exists) {
+          console.log(`Document at path ${docPath} does not exist.`);
+          return;
+        }
 
+        const docData = doc.data();
+        if (!docData) {
+          console.log(`Document at path ${docPath} exists but has no data.`);
+          return;
+        }
 
+        // Generate information about resized images
+        const resizedImagesInfo = await Promise.all(
+          imageResizedEvent.data.outputs
+            .filter(output => output.success)
+            .map(output => {
+              return {
+                size: output.size,
+                storagePath: output.outputFilePath,
+              };
+            })
+        );
+
+        if (resizedImagesInfo.length > 0) {
+          await docRef.update({
+            resizedImages: resizedImagesInfo
+          });
+
+          console.log(`Updated document at path ${docPath} with resized images information.`);
+        }
+      });
     }
   },
 );
