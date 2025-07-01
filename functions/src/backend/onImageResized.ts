@@ -3,10 +3,10 @@ import * as z from "zod/v4-mini";
 import { HttpsError } from "firebase-functions/https";
 import { getFirestore } from "firebase-admin/firestore";
 
-const ImageResizedEvent = z.object({
-  data: z.object({
+const ImageResizedEvent = z.looseObject({
+  data: z.looseObject({
     // input is an ObjectMetadata from "firebase-functions/v1/storage"
-    input: z.object({
+    input: z.looseObject({
       name: z.string(),
       size: z.string(),
       md5Hash: z.string(),
@@ -14,7 +14,7 @@ const ImageResizedEvent = z.object({
     // outputs is an array of ResizedImageResult, see
     // https://github.com/firebase/extensions/blob/2f23c5a7efa657aca8ee7b24f9809644687d5c08/storage-resize-images/functions/src/resize-image.ts#L15
     outputs: z.array(
-      z.object({
+      z.looseObject({
         size: z.string(),
         outputFilePath: z.string(),
         success: z.boolean(),
