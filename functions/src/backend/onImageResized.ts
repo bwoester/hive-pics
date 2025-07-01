@@ -78,7 +78,7 @@ export const onImageResized = onCustomEventPublished(
 
       if (resizedImagesInfo.length > 0) {
         await docRef.update({
-          resizedImages: resizedImagesInfo,
+          resized: resizedImagesInfo,
         });
 
         console.info(
