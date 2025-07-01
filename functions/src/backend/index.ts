@@ -16,5 +16,13 @@ initializeApp();
 
 // Cloud Function exports
 import { generateEventToken } from "./tokens/generateEventToken.js";
+import { onImageResizeStart } from "./onImageResized";
+import { onImageResizeSuccess } from "./onImageResized";
+import { onImageResizeError } from "./onImageResized";
+import { onImageResizeCompletion } from "./onImageResized";
 
 export { generateEventToken };
+export { onImageResizeStart };
+export { onImageResizeSuccess };
+export { onImageResizeError };
+export { onImageResizeCompletion };
