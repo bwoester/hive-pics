@@ -32,8 +32,9 @@ export const onImageResized = onCustomEventPublished(
   async (event) => {
     const validation = ImageResizedEvent.safeParse(event);
     if (!validation.success) {
-      console.error(validation.error.message);
-      throw new HttpsError("invalid-argument", validation.error.message);
+      const message = `Input validation failed: ${validation.error.message}, received: ${JSON.stringify(event)}`;
+      console.error(message);
+      throw new HttpsError("invalid-argument", message);
     } else {
       const imageResizedEvent = validation.data;
       // full file path in the bucket (absolute path, file name, file ext)
