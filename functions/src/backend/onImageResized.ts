@@ -2,6 +2,7 @@ import { onCustomEventPublished } from "firebase-functions/v2/eventarc";
 import * as z from "zod/v4-mini";
 import { HttpsError } from "firebase-functions/https";
 import { getFirestore } from "firebase-admin/firestore";
+import {ResizedImage} from "@shared/types";
 
 const ImageResizedEvent = z.looseObject({
   data: z.looseObject({
@@ -65,7 +66,7 @@ export const onImageResized = onCustomEventPublished(
       }
 
       // Generate information about resized images
-      const resizedImagesInfo = await Promise.all(
+      const resizedImages: ResizedImage[] = await Promise.all(
         imageResizedEvent.data.outputs
           .filter((i) => i.value.success)
           .map((i) => {
@@ -76,9 +77,9 @@ export const onImageResized = onCustomEventPublished(
           }),
       );
 
-      if (resizedImagesInfo.length > 0) {
+      if (resizedImages.length > 0) {
         await docRef.update({
-          resized: resizedImagesInfo,
+          resized: resizedImages,
         });
 
         console.info(

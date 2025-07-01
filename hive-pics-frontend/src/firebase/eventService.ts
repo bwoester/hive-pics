@@ -173,8 +173,8 @@ export const eventService = {
     const metadata: UploadMetadata = {
       cacheControl: "private, max-age=86400, immutable",
     };
-    const challengePhotoDownloadURL = await new Promise<string>(
-      (resolve, reject) => {
+
+    await new Promise<void>((resolve, reject) => {
         const uploadTask = uploadBytesResumable(
           challengePhotoStorageRef,
           challengePhoto,
@@ -188,21 +188,9 @@ export const eventService = {
             onProgress?.(progress);
           },
           (error) => reject(error),
-          async () => {
-            try {
-              const url = await getDownloadURL(uploadTask.snapshot.ref);
-              resolve(url);
-            } catch (error) {
-              if (error instanceof Error) {
-                reject(error);
-              } else {
-                reject(new Error("Upload failed: " + JSON.stringify(error)));
-              }
-            }
-          },
+          () => resolve()
         );
-      },
-    );
+      });
 
     // write document
     const challengePhotoDoc: ChallengePhoto = {
@@ -213,7 +201,7 @@ export const eventService = {
       createdAt: new Date(),
       description,
       storagePath: challengePhotoFilePath,
-      downloadUrl: challengePhotoDownloadURL,
+      resized: []
     };
 
     try {

@@ -1,3 +1,8 @@
+export interface ResizedImage {
+  size: string;
+  storagePath: string;
+}
+
 export interface ChallengePhoto {
   id: string;
   userId: string;
@@ -6,5 +11,5 @@ export interface ChallengePhoto {
   createdAt: Date;
   description?: string;
   storagePath: string;
-  downloadUrl: string;
+  resized: ResizedImage[]
 }
