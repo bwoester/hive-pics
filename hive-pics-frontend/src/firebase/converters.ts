@@ -19,7 +19,9 @@ export const challengePhotoConverter: FirestoreDataConverter<ChallengePhoto> = {
       createdAt: data.createdAt.toDate(),
       description: data.description,
       storagePath: data.storagePath,
-      downloadUrl: data.downloadUrl,
+      width: data.width,
+      height: data.height,
+      resized: data.resized,
     };
   },
 };

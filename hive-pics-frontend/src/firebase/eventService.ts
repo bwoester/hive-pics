@@ -15,11 +15,7 @@ import {
   query,
   setDoc,
 } from "firebase/firestore";
-import {
-  getDownloadURL,
-  ref as storageRef,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { ref as storageRef, uploadBytesResumable } from "firebase/storage";
 import { challengePhotoConverter } from "@/firebase/converters.ts";
 import { db, storage } from "@/firebase/index";
 
@@ -134,6 +130,23 @@ export const eventService = {
     );
   },
 
+  getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.addEventListener("load", () => {
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+        URL.revokeObjectURL(url); // Clean up
+        resolve({ width, height });
+      });
+
+      img.addEventListener("error", reject);
+      img.src = url;
+    });
+  },
+
   async addChallengePhoto(
     userId: string,
     eventId: string,
@@ -175,22 +188,25 @@ export const eventService = {
     };
 
     await new Promise<void>((resolve, reject) => {
-        const uploadTask = uploadBytesResumable(
-          challengePhotoStorageRef,
-          challengePhoto,
-          metadata,
-        );
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            onProgress?.(progress);
-          },
-          (error) => reject(error),
-          () => resolve()
-        );
-      });
+      const uploadTask = uploadBytesResumable(
+        challengePhotoStorageRef,
+        challengePhoto,
+        metadata,
+      );
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          onProgress?.(progress);
+        },
+        (error) => reject(error),
+        () => resolve(),
+      );
+    });
+
+    const challengePhotoDimensions =
+      await this.getImageDimensions(challengePhoto);
 
     // write document
     const challengePhotoDoc: ChallengePhoto = {
@@ -201,7 +217,9 @@ export const eventService = {
       createdAt: new Date(),
       description,
       storagePath: challengePhotoFilePath,
-      resized: []
+      width: challengePhotoDimensions.width,
+      height: challengePhotoDimensions.height,
+      resized: [],
     };
 
     try {

@@ -29,11 +29,22 @@ meta:
             :key="photo.id"
             class="photo-card"
           >
-            <img
-              :alt="photo.description || 'Challenge photo'"
-              class="photo-image"
-              :src="photo.downloadUrl"
-            />
+            <picture>
+              <source
+                :srcset="photoUrls[photo.id]?.webpSrcset"
+                type="image/webp"
+              />
+              <source
+                :srcset="photoUrls[photo.id]?.jpegSrcset"
+                type="image/jpeg"
+              />
+              <img
+                :alt="photo.description || 'Challenge photo'"
+                class="photo-image"
+                :src="photoUrls[photo.id]?.url"
+                :srcset="photoUrls[photo.id]?.srcset"
+              />
+            </picture>
             <div class="photo-info">
               <p v-if="photo.description" class="photo-description">
                 {{ photo.description }}
@@ -59,11 +70,22 @@ meta:
             <div class="embla__container">
               <div v-for="photo in photos" :key="photo.id" class="embla__slide">
                 <div class="photo-card ma-1">
-                  <img
-                    :alt="photo.description || 'Challenge photo'"
-                    class="photo-image"
-                    :src="photo.downloadUrl"
-                  />
+                  <picture>
+                    <source
+                      :srcset="photoUrls[photo.id]?.webpSrcset"
+                      type="image/webp"
+                    />
+                    <source
+                      :srcset="photoUrls[photo.id]?.jpegSrcset"
+                      type="image/jpeg"
+                    />
+                    <img
+                      :alt="photo.description || 'Challenge photo'"
+                      class="photo-image"
+                      :src="photoUrls[photo.id]?.url"
+                      :srcset="photoUrls[photo.id]?.srcset"
+                    />
+                  </picture>
                   <div class="photo-info">
                     <p v-if="photo.description" class="photo-description">
                       {{ photo.description }}
@@ -89,11 +111,22 @@ meta:
             <div class="embla__container">
               <div v-for="photo in photos" :key="photo.id" class="embla__slide">
                 <div class="photo-card ma-1">
-                  <img
-                    :alt="photo.description || 'Challenge photo'"
-                    class="photo-image"
-                    :src="photo.downloadUrl"
-                  />
+                  <picture>
+                    <source
+                      :srcset="photoUrls[photo.id]?.webpSrcset"
+                      type="image/webp"
+                    />
+                    <source
+                      :srcset="photoUrls[photo.id]?.jpegSrcset"
+                      type="image/jpeg"
+                    />
+                    <img
+                      :alt="photo.description || 'Challenge photo'"
+                      class="photo-image"
+                      :src="photoUrls[photo.id]?.url"
+                      :srcset="photoUrls[photo.id]?.srcset"
+                    />
+                  </picture>
                   <div class="photo-info">
                     <p v-if="photo.description" class="photo-description">
                       {{ photo.description }}
@@ -114,10 +147,11 @@ meta:
 </template>
 
 <script setup lang="ts">
+import type { ChallengePhoto } from "@shared";
 import type { EmblaCarouselType } from "embla-carousel";
 import EmblaCarousel from "embla-carousel";
 import { storeToRefs } from "pinia";
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import GalleryFilterBottomSheet from "@/components/GalleryFilterBottomSheet.vue";
 import { useFab } from "@/composables/useFab";
 import { useChallengeStore } from "@/stores/challengeStore.ts";
@@ -130,6 +164,62 @@ const challengeStore = useChallengeStore();
 
 const { isLoading, error, photosByGroup, allPhotosSorted, groupingOption } =
   storeToRefs(galleryStore);
+
+// Store for photo URLs
+const photoUrls = reactive<
+  Record<
+    string,
+    { url: string; srcset: string; webpSrcset: string; jpegSrcset: string }
+  >
+>({});
+
+// Load URL and srcset for a photo
+async function loadPhotoUrls(photo: ChallengePhoto) {
+  if (!photoUrls[photo.id]) {
+    photoUrls[photo.id] = {
+      url: "",
+      srcset: "",
+      webpSrcset: "",
+      jpegSrcset: "",
+    };
+  }
+
+  try {
+    // Get the main image URL
+    photoUrls[photo.id].url = await galleryStore.getPhotoDownloadURL(
+      photo.storagePath,
+    );
+
+    // Get the srcset if available
+    if (photo.resized && photo.resized.length > 0) {
+      // Get default srcset (all formats)
+      photoUrls[photo.id].srcset = await galleryStore.getPhotoSrcSet(photo);
+
+      // Get format-specific srcsets
+      photoUrls[photo.id].webpSrcset = await galleryStore.getPhotoSrcSet(
+        photo,
+        "webp",
+      );
+      photoUrls[photo.id].jpegSrcset = await galleryStore.getPhotoSrcSet(
+        photo,
+        "jpeg",
+      );
+    }
+  } catch (error) {
+    console.error(`Error loading URLs for photo ${photo.id}:`, error);
+  }
+}
+
+// Watch for changes in photos and load URLs
+watch(
+  () => allPhotosSorted.value,
+  async (newPhotos) => {
+    for (const photo of newPhotos) {
+      await loadPhotoUrls(photo);
+    }
+  },
+  { immediate: true, deep: true },
+);
 
 // Create embla carousel refs for each group
 type EmblaInfo = {

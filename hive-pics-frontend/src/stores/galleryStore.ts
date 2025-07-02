@@ -1,9 +1,12 @@
 import type { ChallengePhoto } from "@shared";
+import type { ResizedImage } from "@shared/types.ts";
 import type { Unsubscribe } from "firebase/firestore";
 // Utilities
 import { onSnapshot, query } from "firebase/firestore";
+import { getDownloadURL, ref as storageRef } from "firebase/storage";
 import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
+import { storage } from "@/firebase";
 import { eventService } from "@/firebase/eventService.ts";
 import { useAuthStore } from "@/stores/authStore.ts";
 import { useEventStore } from "@/stores/eventStore.ts";
@@ -19,6 +22,9 @@ export const useGalleryStore = defineStore("gallery", () => {
   const error = ref<string | null>(null);
   const eventStore = useEventStore();
   const authStore = useAuthStore();
+
+  // Cache for download URLs to avoid redundant requests
+  const downloadURLCache = ref<Record<string, string>>({});
 
   // Gallery filtering and sorting options
   const groupingOption = ref<GalleryGroupingOption>("none");
@@ -176,6 +182,11 @@ export const useGalleryStore = defineStore("gallery", () => {
     }
   }
 
+  // Clear the download URL cache
+  function clearDownloadURLCache() {
+    downloadURLCache.value = {};
+  }
+
   // Methods to set gallery filtering and sorting options
   function setGroupingOption(option: GalleryGroupingOption) {
     groupingOption.value = option;
@@ -193,6 +204,9 @@ export const useGalleryStore = defineStore("gallery", () => {
   watch(
     () => eventStore.currentEventId,
     (newEventId) => {
+      // Clear the download URL cache when switching events
+      clearDownloadURLCache();
+
       if (newEventId) {
         subscribeToPhotos();
       } else {
@@ -202,6 +216,77 @@ export const useGalleryStore = defineStore("gallery", () => {
     },
     { immediate: true },
   );
+
+  // Helper function to get download URL for a storage path
+  async function getPhotoDownloadURL(storagePath: string): Promise<string> {
+    try {
+      // Check if URL is already in cache
+      if (downloadURLCache.value[storagePath]) {
+        return downloadURLCache.value[storagePath];
+      }
+
+      // If not in cache, fetch from Firebase Storage
+      const imageRef = storageRef(storage, storagePath);
+      const url = await getDownloadURL(imageRef);
+
+      // Store in cache for future use
+      downloadURLCache.value[storagePath] = url;
+
+      return url;
+    } catch (error) {
+      console.error("Error getting download URL:", error);
+      throw new Error("Failed to get download URL");
+    }
+  }
+
+  // Helper function to generate srcset string from resized images
+  async function getPhotoSrcSet(
+    photo: ChallengePhoto,
+    fileType?: string,
+  ): Promise<string> {
+    if (!photo.resized || photo.resized.length === 0) {
+      // If no resized images, return empty string
+      return "";
+    }
+
+    try {
+      // Sort resized images by width
+      const sortedResized = [...photo.resized].sort(
+        (a, b) => a.width - b.width,
+      );
+
+      // Filter by file type if specified
+      const filteredResized = fileType
+        ? sortedResized.filter((resized) => {
+            // Extract file extension from storage path
+            const extension = resized.storagePath
+              .split(".")
+              .pop()
+              ?.toLowerCase();
+            return extension === fileType.toLowerCase().replace(".", "");
+          })
+        : sortedResized;
+
+      // If no images match the file type, return empty string
+      if (filteredResized.length === 0) {
+        return "";
+      }
+
+      // Get download URLs for filtered resized images
+      const srcSetPromises = filteredResized.map(
+        async (resized: ResizedImage) => {
+          const url = await getPhotoDownloadURL(resized.storagePath);
+          return `${url} ${resized.width}w`;
+        },
+      );
+
+      const srcSetEntries = await Promise.all(srcSetPromises);
+      return srcSetEntries.join(", ");
+    } catch (error) {
+      console.error("Error generating srcset:", error);
+      return "";
+    }
+  }
 
   return {
     photos,
@@ -221,5 +306,11 @@ export const useGalleryStore = defineStore("gallery", () => {
     setGroupingOption,
     setSortingOption,
     setSortingDirection,
+    // New methods for handling photo URLs
+    getPhotoDownloadURL,
+    getPhotoSrcSet,
+    // URL cache management
+    downloadURLCache,
+    clearDownloadURLCache,
   };
 });

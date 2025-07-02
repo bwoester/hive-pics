@@ -1,5 +1,7 @@
 export interface ResizedImage {
-  size: string;
+  boxSize: string;
+  width: number;
+  height: number;
   storagePath: string;
 }
 
@@ -11,5 +13,7 @@ export interface ChallengePhoto {
   createdAt: Date;
   description?: string;
   storagePath: string;
+  width: number;
+  height: number;
   resized: ResizedImage[];
 }
