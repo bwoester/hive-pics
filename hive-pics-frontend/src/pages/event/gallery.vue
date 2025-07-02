@@ -90,7 +90,10 @@ meta:
               <div v-for="photo in photos" :key="photo.id" class="embla__slide">
                 <div class="photo-card ma-1">
                   <div class="photo-container">
-                    <div v-if="photoUrls[photo.id]?.isLoading" class="photo-loading">
+                    <div
+                      v-if="photoUrls[photo.id]?.isLoading"
+                      class="photo-loading"
+                    >
                       <v-progress-circular color="primary" indeterminate />
                     </div>
                     <picture v-show="!photoUrls[photo.id]?.isLoading">
@@ -138,7 +141,10 @@ meta:
               <div v-for="photo in photos" :key="photo.id" class="embla__slide">
                 <div class="photo-card ma-1">
                   <div class="photo-container">
-                    <div v-if="photoUrls[photo.id]?.isLoading" class="photo-loading">
+                    <div
+                      v-if="photoUrls[photo.id]?.isLoading"
+                      class="photo-loading"
+                    >
                       <v-progress-circular color="primary" indeterminate />
                     </div>
                     <picture v-show="!photoUrls[photo.id]?.isLoading">
@@ -216,9 +222,19 @@ const photoUrls = reactive<
 // Load URL and srcset for a photo
 async function loadPhotoUrls(photo: ChallengePhoto) {
   try {
-    // Get the main image URL
+    // Get the closest JPEG under a maximum width
+    const fallbackImage: { storagePath: string } = photo.resized.reduce((closest, current) => {
+      const maxWidth = 600; // desired maximum width
+      const isJpeg = current.storagePath.toLowerCase().endsWith('.jpg') ||
+        current.storagePath.toLowerCase().endsWith('.jpeg');
+
+      if (isJpeg && current.width <= maxWidth && (!closest || current.width > closest.width)) {
+        return current;
+      }
+      return closest;
+    }, null as { storagePath: string; width: number } | null) || photo;
     photoUrls[photo.id].url = await galleryStore.getPhotoDownloadURL(
-      photo.storagePath,
+      fallbackImage.storagePath,
     );
 
     // Get the srcset if available
