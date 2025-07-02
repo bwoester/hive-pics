@@ -29,35 +29,41 @@ meta:
             :key="photo.id"
             class="photo-card"
           >
-            <picture>
-              <source
-                sizes="
-                  (max-width: 599px) 100vw,
-                  (max-width: 899px) 50vw,
-                  (max-width: 1199px) 33.3vw,
-                  (max-width: 1499px) 25vw,
-                  20vw
-                "
-                :srcset="photoUrls[photo.id]?.webpSrcset"
-                type="image/webp"
-              />
-              <source
-                sizes="
-                  (max-width: 599px) 100vw,
-                  (max-width: 899px) 50vw,
-                  (max-width: 1199px) 33.3vw,
-                  (max-width: 1499px) 25vw,
-                  20vw
-                "
-                :srcset="photoUrls[photo.id]?.jpegSrcset"
-                type="image/jpeg"
-              />
-              <img
-                :alt="photo.description || 'Challenge photo'"
-                class="photo-image"
-                :src="photoUrls[photo.id]?.url"
-              />
-            </picture>
+            <div class="photo-container">
+              <div v-if="photoUrls[photo.id]?.isLoading" class="photo-loading">
+                <v-progress-circular color="primary" indeterminate />
+              </div>
+              <picture v-show="!photoUrls[photo.id]?.isLoading">
+                <source
+                  sizes="
+                    (max-width: 599px) 100vw,
+                    (max-width: 899px) 50vw,
+                    (max-width: 1199px) 33.3vw,
+                    (max-width: 1499px) 25vw,
+                    20vw
+                  "
+                  :srcset="photoUrls[photo.id]?.webpSrcset"
+                  type="image/webp"
+                />
+                <source
+                  sizes="
+                    (max-width: 599px) 100vw,
+                    (max-width: 899px) 50vw,
+                    (max-width: 1199px) 33.3vw,
+                    (max-width: 1499px) 25vw,
+                    20vw
+                  "
+                  :srcset="photoUrls[photo.id]?.jpegSrcset"
+                  type="image/jpeg"
+                />
+                <img
+                  :alt="photo.description || 'Challenge photo'"
+                  class="photo-image"
+                  :src="photoUrls[photo.id]?.url"
+                  @load="photoUrls[photo.id].isLoading = false"
+                />
+              </picture>
+            </div>
             <div class="photo-info">
               <p v-if="photo.description" class="photo-description">
                 {{ photo.description }}
@@ -83,23 +89,29 @@ meta:
             <div class="embla__container">
               <div v-for="photo in photos" :key="photo.id" class="embla__slide">
                 <div class="photo-card ma-1">
-                  <picture>
-                    <source
-                      sizes="90vw"
-                      :srcset="photoUrls[photo.id]?.webpSrcset"
-                      type="image/webp"
-                    />
-                    <source
-                      sizes="90vw"
-                      :srcset="photoUrls[photo.id]?.jpegSrcset"
-                      type="image/jpeg"
-                    />
-                    <img
-                      :alt="photo.description || 'Challenge photo'"
-                      class="photo-image"
-                      :src="photoUrls[photo.id]?.url"
-                    />
-                  </picture>
+                  <div class="photo-container">
+                    <div v-if="photoUrls[photo.id]?.isLoading" class="photo-loading">
+                      <v-progress-circular color="primary" indeterminate />
+                    </div>
+                    <picture v-show="!photoUrls[photo.id]?.isLoading">
+                      <source
+                        sizes="90vw"
+                        :srcset="photoUrls[photo.id]?.webpSrcset"
+                        type="image/webp"
+                      />
+                      <source
+                        sizes="90vw"
+                        :srcset="photoUrls[photo.id]?.jpegSrcset"
+                        type="image/jpeg"
+                      />
+                      <img
+                        :alt="photo.description || 'Challenge photo'"
+                        class="photo-image"
+                        :src="photoUrls[photo.id]?.url"
+                        @load="photoUrls[photo.id].isLoading = false"
+                      />
+                    </picture>
+                  </div>
                   <div class="photo-info">
                     <p v-if="photo.description" class="photo-description">
                       {{ photo.description }}
@@ -125,24 +137,30 @@ meta:
             <div class="embla__container">
               <div v-for="photo in photos" :key="photo.id" class="embla__slide">
                 <div class="photo-card ma-1">
-                  <picture>
-                    <source
-                      sizes="90vw"
-                      :srcset="photoUrls[photo.id]?.webpSrcset"
-                      type="image/webp"
-                    />
-                    <source
-                      sizes="90vw"
-                      :srcset="photoUrls[photo.id]?.jpegSrcset"
-                      type="image/jpeg"
-                    />
-                    <img
-                      :alt="photo.description || 'Challenge photo'"
-                      class="photo-image"
-                      loading="lazy"
-                      :src="photoUrls[photo.id]?.url"
-                    />
-                  </picture>
+                  <div class="photo-container">
+                    <div v-if="photoUrls[photo.id]?.isLoading" class="photo-loading">
+                      <v-progress-circular color="primary" indeterminate />
+                    </div>
+                    <picture v-show="!photoUrls[photo.id]?.isLoading">
+                      <source
+                        sizes="90vw"
+                        :srcset="photoUrls[photo.id]?.webpSrcset"
+                        type="image/webp"
+                      />
+                      <source
+                        sizes="90vw"
+                        :srcset="photoUrls[photo.id]?.jpegSrcset"
+                        type="image/jpeg"
+                      />
+                      <img
+                        :alt="photo.description || 'Challenge photo'"
+                        class="photo-image"
+                        loading="lazy"
+                        :src="photoUrls[photo.id]?.url"
+                        @load="photoUrls[photo.id].isLoading = false"
+                      />
+                    </picture>
+                  </div>
                   <div class="photo-info">
                     <p v-if="photo.description" class="photo-description">
                       {{ photo.description }}
@@ -181,25 +199,22 @@ const challengeStore = useChallengeStore();
 const { isLoading, error, photosByGroup, allPhotosSorted, groupingOption } =
   storeToRefs(galleryStore);
 
-// Store for photo URLs
+// Store for photo URLs and loading states
 const photoUrls = reactive<
   Record<
     string,
-    { url: string; srcset: string; webpSrcset: string; jpegSrcset: string }
+    {
+      url: string;
+      srcset: string;
+      webpSrcset: string;
+      jpegSrcset: string;
+      isLoading: boolean;
+    }
   >
 >({});
 
 // Load URL and srcset for a photo
 async function loadPhotoUrls(photo: ChallengePhoto) {
-  if (!photoUrls[photo.id]) {
-    photoUrls[photo.id] = {
-      url: "",
-      srcset: "",
-      webpSrcset: "",
-      jpegSrcset: "",
-    };
-  }
-
   try {
     // Get the main image URL
     photoUrls[photo.id].url = await galleryStore.getPhotoDownloadURL(
@@ -221,8 +236,12 @@ async function loadPhotoUrls(photo: ChallengePhoto) {
         "jpeg",
       );
     }
+
+    // Keep isLoading true until the image is actually loaded in the DOM
+    // The onload event handler on the img element will set this to false
   } catch (error) {
     console.error(`Error loading URLs for photo ${photo.id}:`, error);
+    photoUrls[photo.id].isLoading = false; // Set to false on error
   }
 }
 
@@ -230,8 +249,24 @@ async function loadPhotoUrls(photo: ChallengePhoto) {
 watch(
   () => allPhotosSorted.value,
   async (newPhotos) => {
+    // First, initialize all photos with loading state
     for (const photo of newPhotos) {
-      await loadPhotoUrls(photo);
+      if (photoUrls[photo.id]) {
+        photoUrls[photo.id].isLoading = true;
+      } else {
+        photoUrls[photo.id] = {
+          url: "",
+          srcset: "",
+          webpSrcset: "",
+          jpegSrcset: "",
+          isLoading: true,
+        };
+      }
+    }
+
+    // Then load URLs for all photos (can be done in parallel)
+    for (const photo of newPhotos) {
+      loadPhotoUrls(photo);
     }
   },
   { immediate: true, deep: true },
@@ -377,6 +412,24 @@ const formatDate = (date: Date): string => {
 .photo-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.photo-container {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.photo-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
 }
 
 .photo-image {
