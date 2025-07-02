@@ -31,10 +31,24 @@ meta:
           >
             <picture>
               <source
+                sizes="
+                  (max-width: 599px) 100vw,
+                  (max-width: 899px) 50vw,
+                  (max-width: 1199px) 33.3vw,
+                  (max-width: 1499px) 25vw,
+                  20vw
+                "
                 :srcset="photoUrls[photo.id]?.webpSrcset"
                 type="image/webp"
               />
               <source
+                sizes="
+                  (max-width: 599px) 100vw,
+                  (max-width: 899px) 50vw,
+                  (max-width: 1199px) 33.3vw,
+                  (max-width: 1499px) 25vw,
+                  20vw
+                "
                 :srcset="photoUrls[photo.id]?.jpegSrcset"
                 type="image/jpeg"
               />
@@ -42,7 +56,6 @@ meta:
                 :alt="photo.description || 'Challenge photo'"
                 class="photo-image"
                 :src="photoUrls[photo.id]?.url"
-                :srcset="photoUrls[photo.id]?.srcset"
               />
             </picture>
             <div class="photo-info">
@@ -72,10 +85,12 @@ meta:
                 <div class="photo-card ma-1">
                   <picture>
                     <source
+                      sizes="90vw"
                       :srcset="photoUrls[photo.id]?.webpSrcset"
                       type="image/webp"
                     />
                     <source
+                      sizes="90vw"
                       :srcset="photoUrls[photo.id]?.jpegSrcset"
                       type="image/jpeg"
                     />
@@ -83,7 +98,6 @@ meta:
                       :alt="photo.description || 'Challenge photo'"
                       class="photo-image"
                       :src="photoUrls[photo.id]?.url"
-                      :srcset="photoUrls[photo.id]?.srcset"
                     />
                   </picture>
                   <div class="photo-info">
@@ -113,18 +127,20 @@ meta:
                 <div class="photo-card ma-1">
                   <picture>
                     <source
+                      sizes="90vw"
                       :srcset="photoUrls[photo.id]?.webpSrcset"
                       type="image/webp"
                     />
                     <source
+                      sizes="90vw"
                       :srcset="photoUrls[photo.id]?.jpegSrcset"
                       type="image/jpeg"
                     />
                     <img
                       :alt="photo.description || 'Challenge photo'"
                       class="photo-image"
+                      loading="lazy"
                       :src="photoUrls[photo.id]?.url"
-                      :srcset="photoUrls[photo.id]?.srcset"
                     />
                   </picture>
                   <div class="photo-info">

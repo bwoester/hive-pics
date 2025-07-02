@@ -4,6 +4,7 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
+    "deploy": "firebase deploy --only hosting",
     "dev": "vite",
     "prebuild": "run-s format lint type-check",
     "build": "npm run build-only --",
