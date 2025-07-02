@@ -223,16 +223,25 @@ const photoUrls = reactive<
 async function loadPhotoUrls(photo: ChallengePhoto) {
   try {
     // Get the closest JPEG under a maximum width
-    const fallbackImage: { storagePath: string } = photo.resized.reduce((closest, current) => {
-      const maxWidth = 600; // desired maximum width
-      const isJpeg = current.storagePath.toLowerCase().endsWith('.jpg') ||
-        current.storagePath.toLowerCase().endsWith('.jpeg');
+    const fallbackImage: { storagePath: string } =
+      photo.resized.reduce(
+        (closest, current) => {
+          const maxWidth = 600; // desired maximum width
+          const isJpeg =
+            current.storagePath.toLowerCase().endsWith(".jpg") ||
+            current.storagePath.toLowerCase().endsWith(".jpeg");
 
-      if (isJpeg && current.width <= maxWidth && (!closest || current.width > closest.width)) {
-        return current;
-      }
-      return closest;
-    }, null as { storagePath: string; width: number } | null) || photo;
+          if (
+            isJpeg &&
+            current.width <= maxWidth &&
+            (!closest || current.width > closest.width)
+          ) {
+            return current;
+          }
+          return closest;
+        },
+        null as { storagePath: string; width: number } | null,
+      ) || photo;
     photoUrls[photo.id].url = await galleryStore.getPhotoDownloadURL(
       fallbackImage.storagePath,
     );
