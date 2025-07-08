@@ -26,6 +26,7 @@ declare module 'vue-router/auto-routes' {
     '/event/': RouteRecordInfo<'/event/', '/event', Record<never, never>, Record<never, never>>,
     '/event/challenges': RouteRecordInfo<'/event/challenges', '/event/challenges', Record<never, never>, Record<never, never>>,
     '/event/gallery': RouteRecordInfo<'/event/gallery', '/event/gallery', Record<never, never>, Record<never, never>>,
+    '/event/join': RouteRecordInfo<'/event/join', '/event/join', Record<never, never>, Record<never, never>>,
     '/event/leaderboard': RouteRecordInfo<'/event/leaderboard', '/event/leaderboard', Record<never, never>, Record<never, never>>,
     '/legalNotice': RouteRecordInfo<'/legalNotice', '/legalNotice', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,

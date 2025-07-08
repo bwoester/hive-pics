@@ -19,15 +19,12 @@ meta:
             </div>
 
             <div v-else-if="error" class="error-container">
-              <v-icon class="mb-4" color="error" size="64">mdi-alert-circle</v-icon>
+              <v-icon class="mb-4" color="error" size="64"
+                >mdi-alert-circle</v-icon
+              >
               <h2 class="text-h5 mb-4">{{ errorTitle }}</h2>
               <p class="text-body-1">{{ error }}</p>
-              <v-btn
-                class="mt-6"
-                color="primary"
-                to="/"
-                variant="elevated"
-              >
+              <v-btn class="mt-6" color="primary" to="/" variant="elevated">
                 Return to Home
               </v-btn>
             </div>
@@ -39,11 +36,11 @@ meta:
 </template>
 
 <script setup lang="ts">
-import { onAuthStateChanged } from 'firebase/auth';
-import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { guestTokenService } from '@/firebase/guestTokenService';
-import { auth } from '@/firebase/index';
+import { onAuthStateChanged } from "firebase/auth";
+import { computed, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { auth } from "@/firebase";
+import { guestTokenService } from "@/firebase/guestTokenService";
 
 const route = useRoute();
 const router = useRouter();
@@ -51,12 +48,12 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 
 const errorTitle = computed(() => {
-  if (error.value?.includes('expired')) {
-    return 'Invitation Expired';
-  } else if (error.value?.includes('invalid')) {
-    return 'Invalid Invitation';
+  if (error.value?.includes("expired")) {
+    return "Invitation Expired";
+  } else if (error.value?.includes("invalid")) {
+    return "Invalid Invitation";
   } else {
-    return 'Error';
+    return "Error";
   }
 });
 
@@ -64,7 +61,8 @@ onMounted(() => {
   const tokenId = route.query.t as string;
 
   if (!tokenId) {
-    error.value = 'No invitation token provided. Please check your link and try again.';
+    error.value =
+      "No invitation token provided. Please check your link and try again.";
     loading.value = false;
     return;
   }
@@ -77,21 +75,26 @@ onMounted(() => {
 
       // Check if token exists
       if (!token) {
-        error.value = 'This invitation link is invalid. Please check with the event host for a valid link.';
+        error.value =
+          "This invitation link is invalid. Please check with the event host for a valid link.";
         loading.value = false;
         return;
       }
 
       // Check if token is expired
       if (guestTokenService.isTokenExpired(token)) {
-        error.value = 'This invitation has expired. Please contact the event host for a new invitation.';
+        error.value =
+          "This invitation has expired. Please contact the event host for a new invitation.";
         loading.value = false;
         return;
       }
 
       // If user is authenticated, check if they're already a guest
       if (user) {
-        const isGuest = await guestTokenService.isUserEventGuest(token.eventId, user.uid);
+        const isGuest = await guestTokenService.isUserEventGuest(
+          token.eventId,
+          user.uid,
+        );
 
         if (isGuest) {
           // User is already a guest, redirect to gallery
@@ -101,21 +104,24 @@ onMounted(() => {
       }
 
       // Otherwise, store token info in localStorage and redirect to guest landing page
-      localStorage.setItem('guestToken', JSON.stringify({
-        token: tokenId,
-        eventId: token.eventId,
-        hostId: token.userId
-      }));
+      localStorage.setItem(
+        "guestToken",
+        JSON.stringify({
+          token: tokenId,
+          eventId: token.eventId,
+          hostId: token.userId,
+        }),
+      );
 
       // Redirect to GuestLandingPage (we'll create this component next)
       router.push({
         path: `/event/${token.eventId}`,
-        query: { mode: 'guest' }
+        query: { mode: "guest" },
       });
-
     } catch (error_) {
-      console.error('Error processing token:', error_);
-      error.value = 'An error occurred while processing your invitation. Please try again later.';
+      console.error("Error processing token:", error_);
+      error.value =
+        "An error occurred while processing your invitation. Please try again later.";
     } finally {
       loading.value = false;
       unsubscribe(); // Clean up auth listener

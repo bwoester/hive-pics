@@ -1,6 +1,13 @@
 import type { GuestToken } from "@shared";
 import type { Unsubscribe } from "firebase/firestore";
-import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/firebase/index";
 
 export const guestTokenService = {
