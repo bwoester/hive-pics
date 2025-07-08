@@ -9,10 +9,23 @@
   </v-main>
 
   <AppFooter />
+
+  <!-- FAB: Only rendered if defined -->
+  <v-fab
+    v-show="!!fabState"
+    :active="fabState?.active ?? false"
+    app
+    :elevation="fabState?.elevation ?? 8"
+    :icon="fabState?.icon ?? 'mdi-filter-variant'"
+    @click="fabState?.onClick"
+  >
+  </v-fab>
 </template>
 
 <script lang="ts" setup>
-/* nop */
+import { useFab } from "@/composables/useFab";
+
+const { fabState } = useFab();
 </script>
 
 <style scoped lang="sass">

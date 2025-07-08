@@ -19,6 +19,7 @@ declare module 'vue' {
     PhotoCapture: typeof import('./components/shared/PhotoCapture.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ShareEventBottomSheet: typeof import('./components/ShareEventBottomSheet.vue')['default']
     UnderConstruction: typeof import('./components/UnderConstruction.vue')['default']
   }
 }

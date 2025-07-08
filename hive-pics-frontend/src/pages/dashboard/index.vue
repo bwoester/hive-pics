@@ -6,20 +6,6 @@ meta:
 
 <template>
   <v-container>
-    <!-- Create New Event Button -->
-    <v-row v-if="!eventStore.isEmpty" class="mb-6">
-      <v-col cols="12">
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-plus"
-          size="large"
-          :to="{ name: '/dashboard/events/create' }"
-        >
-          Create New Event
-        </v-btn>
-      </v-col>
-    </v-row>
-
     <!-- Events List -->
     <v-row>
       <v-col cols="12">
@@ -28,7 +14,12 @@ meta:
     </v-row>
 
     <v-row v-if="!eventStore.isEmpty">
-      <EventCard v-for="event in events" :key="event.id" :event="event" />
+      <EventCard
+        v-for="event in events"
+        :key="event.id"
+        :event="event"
+        @share="handleShareEvent"
+      />
     </v-row>
 
     <!-- Empty State (shown when no events) -->
@@ -52,12 +43,54 @@ meta:
         </v-sheet>
       </v-col>
     </v-row>
+
+    <!-- Share Event Bottom Sheet -->
+    <ShareEventBottomSheet
+      v-model="isShareBottomSheetOpen"
+      :event="selectedEvent"
+    />
   </v-container>
 </template>
 
 <script lang="ts" setup>
+import type { Event } from "@shared";
+import { storeToRefs } from "pinia";
+import { onBeforeUnmount, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import ShareEventBottomSheet from "@/components/ShareEventBottomSheet.vue";
+import { useFab } from "@/composables/useFab";
 import { useEventStore } from "@/stores/eventStore.ts";
 
 const eventStore = useEventStore();
 const { events } = storeToRefs(eventStore);
+
+// FAB setup
+const { setFabState, clearFabState } = useFab();
+
+const router = useRouter();
+
+function handleFabClick() {
+  // Navigate to create event page
+  router.push({ name: "/dashboard/events/create" });
+}
+
+onMounted(() => {
+  setFabState({
+    icon: "mdi-plus",
+    onClick: handleFabClick,
+  });
+});
+
+onBeforeUnmount(() => {
+  clearFabState();
+});
+
+// Share bottom sheet setup
+const isShareBottomSheetOpen = ref(false);
+const selectedEvent = ref<Event | undefined>(undefined);
+
+function handleShareEvent(event: Event) {
+  selectedEvent.value = event;
+  isShareBottomSheetOpen.value = true;
+}
 </script>

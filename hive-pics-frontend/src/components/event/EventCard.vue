@@ -18,13 +18,13 @@
         >
         <v-btn
           color="primary"
-          prepend-icon="mdi-eye"
+          prepend-icon="mdi-share-variant"
           variant="text"
-          @click="viewEvent"
-          >View Event</v-btn
+          @click="$emit('share', event)"
+          >Share</v-btn
         >
-        <v-spacer />
-        <v-btn icon="mdi-dots-vertical" variant="text" />
+        <!--        <v-spacer />-->
+        <!--        <v-btn icon="mdi-dots-vertical" variant="text" />-->
       </v-card-actions>
     </v-card>
   </v-col>
@@ -32,24 +32,26 @@
 
 <script setup lang="ts">
 import type { Event } from "@shared";
-import { useRouter } from "vue-router";
-import { useEventStore } from "@/stores/eventStore.ts";
+// import { useRouter } from "vue-router";
+// import { useEventStore } from "@/stores/eventStore.ts";
 
 const props = defineProps<{
   event: Event;
 }>();
 
+defineEmits<(e: "share", event: Event) => void>();
+
 const imageUrl = computed(
   () => props.event.coverImageUrl || "https://picsum.photos/500/300?random=1",
 );
 
-const eventStore = useEventStore();
-const router = useRouter();
-
-function viewEvent() {
-  eventStore.setCurrentEventId(props.event.id);
-  router.push({ name: "/event/gallery" });
-}
+// const eventStore = useEventStore();
+// const router = useRouter();
+//
+// function viewEvent() {
+//   eventStore.setCurrentEventId(props.event.id);
+//   router.push({ name: "/event/gallery" });
+// }
 </script>
 
 <style scoped></style>
