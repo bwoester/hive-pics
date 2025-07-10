@@ -29,13 +29,6 @@
         <v-list-item
           v-for="item in actions"
           :key="item.id"
-          :class="{
-            'status-animation': item.id === activeStatusId,
-            'status-success':
-              item.id === activeStatusId && statusType === 'success',
-            'status-error':
-              item.id === activeStatusId && statusType === 'error',
-          }"
           :loading="item.id === loadingActionId"
           :prepend-icon="item.icon"
           :value="item.id"
@@ -50,6 +43,17 @@
       </v-card-actions>
     </v-card>
   </v-bottom-sheet>
+
+  <!-- Snackbar for feedback -->
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    <div class="d-flex align-center">
+      <v-icon class="mr-2" :icon="snackbar.icon"></v-icon>
+      {{ snackbar.text }}
+    </div>
+    <template #actions>
+      <v-btn variant="text" @click="snackbar.show = false">Close</v-btn>
+    </template>
+  </v-snackbar>
 
   <!-- Hidden Print Template -->
   <div ref="printTemplate" class="print-template">
@@ -89,8 +93,14 @@ const printTemplate = ref<HTMLElement | null>(null);
 
 // UX feedback state
 const loadingActionId = ref<number | null>(null);
-const activeStatusId = ref<number | null>(null);
-const statusType = ref<"success" | "error">("success");
+
+// Snackbar state
+const snackbar = ref({
+  show: false,
+  text: "",
+  color: "success",
+  icon: "mdi-check-circle",
+});
 
 // Compute the invitation link based on the event ID
 const invitationLink = computed(() => {
@@ -130,19 +140,36 @@ const actions = [
   { id: 2, icon: "mdi-printer", text: "Print QR code", onClick: printQRCode },
 ];
 
+// Helper functions to show status messages
+function showSuccess(message: string) {
+  snackbar.value = {
+    show: true,
+    text: message,
+    color: "success",
+    icon: "mdi-check-circle",
+  };
+}
+
+function showError(message: string) {
+  snackbar.value = {
+    show: true,
+    text: message,
+    color: "error",
+    icon: "mdi-alert-circle",
+  };
+}
+
 // Helper function to show status message
 function showStatus(
   actionId: number,
   message: string,
   type: "success" | "error" = "success",
 ) {
-  statusType.value = type;
-  activeStatusId.value = actionId;
-  setTimeout(() => {
-    if (activeStatusId.value === actionId) {
-      activeStatusId.value = null;
-    }
-  }, 1500); // Animation duration
+  if (type === "success") {
+    showSuccess(message);
+  } else {
+    showError(message);
+  }
 }
 
 // Opens the invitation link in a new window
@@ -229,35 +256,6 @@ function printQRCode() {
 </script>
 
 <style scoped>
-.status-animation {
-  position: relative;
-  overflow: hidden;
-  transform-origin: center;
-  transition: transform 0.2s ease;
-}
-
-.status-animation:active {
-  transform: scale(0.98);
-}
-
-.status-animation::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 1.5s ease;
-}
-
-.status-success::after {
-  opacity: 1;
-  background-color: rgba(76, 230, 100, 0.2); /* Material success green */
-}
-
-.status-error::after {
-  opacity: 1;
-  background-color: rgba(255, 71, 71, 0.2); /* Material error red */
-}
-
 .qr-code-container {
   display: flex;
   justify-content: center;
@@ -325,12 +323,5 @@ function printQRCode() {
   font-size: 18px;
   margin-bottom: 10px;
   color: #555;
-}
-
-.invitation-link {
-  font-size: 14px;
-  color: #1976d2;
-  word-break: break-all;
-  margin-top: 10px;
 }
 </style>
