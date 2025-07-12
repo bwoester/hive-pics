@@ -97,19 +97,19 @@ const cardSizeClass = computed(() => {
 .size-a7 {
   /* DIN A7: 105x74mm (landscape orientation) */
   aspect-ratio: 1.4189; /* 105/74 */
-  max-width: 350px;
+  max-width: 105mm;
 }
 
 .size-a8 {
   /* DIN A8: 74x52mm (landscape orientation) */
   aspect-ratio: 1.4231; /* 74/52 */
-  max-width: 250px;
+  max-width: 74mm;
 }
 
 .size-business {
   /* Business card: 85x55mm (landscape orientation) */
   aspect-ratio: 1.5455; /* 85/55 */
-  max-width: 350px;
+  max-width: 85mm;
 }
 
 /* Left side of the card */
