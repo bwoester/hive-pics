@@ -13,6 +13,7 @@ declare module 'vue' {
     ChallengeCard: typeof import('./components/challenge/ChallengeCard.vue')['default']
     EventCard: typeof import('./components/event/EventCard.vue')['default']
     EventForm: typeof import('./components/event/EventForm.vue')['default']
+    EventInvitation: typeof import('./components/event/EventInvitation.vue')['default']
     GalleryFilterBottomSheet: typeof import('./components/GalleryFilterBottomSheet.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     ImagePreviewDialog: typeof import('./components/shared/ImagePreviewDialog.vue')['default']

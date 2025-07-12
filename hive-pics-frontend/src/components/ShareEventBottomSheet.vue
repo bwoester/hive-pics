@@ -54,24 +54,6 @@
       <v-btn variant="text" @click="snackbar.show = false">Close</v-btn>
     </template>
   </v-snackbar>
-
-  <!-- Hidden Print Template -->
-  <div ref="printTemplate" class="print-template">
-    <div class="vcard">
-      <div class="logo-container">
-        <img alt="Hivepics Logo" class="logo" src="@/assets/logo.svg" />
-      </div>
-      <h2 v-if="event" class="event-title">{{ event.title }}</h2>
-      <div class="qr-code-print">
-        <img
-          v-if="invitationLink"
-          alt="Event QR Code"
-          :src="`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(invitationLink)}`"
-        />
-      </div>
-      <p class="invitation-text">Scan to join the event</p>
-    </div>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -89,7 +71,6 @@ const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 // Bottom sheet state
 const isOpen = ref(props.modelValue);
 const qrCodeImage = ref<HTMLImageElement | null>(null);
-const printTemplate = ref<HTMLElement | null>(null);
 
 // UX feedback state
 const loadingActionId = ref<number | null>(null);
@@ -125,19 +106,19 @@ watch(isOpen, (newValue) => {
 });
 
 const actions = [
+  { id: 0, icon: "mdi-printer", text: "Print QR code", onClick: printQRCode },
   {
-    id: 0,
+    id: 1,
     icon: "mdi-link-variant",
     text: "Open invitation link",
     onClick: openInvitationLink,
   },
   {
-    id: 1,
+    id: 2,
     icon: "mdi-content-copy",
     text: "Copy invitation link",
     onClick: copyInvitationLink,
   },
-  { id: 2, icon: "mdi-printer", text: "Print QR code", onClick: printQRCode },
 ];
 
 // Helper functions to show status messages
@@ -204,54 +185,11 @@ async function copyInvitationLink() {
 
 // Function to print QR code
 function printQRCode() {
-  if (!printTemplate.value) return;
+  if (!props.event) return;
 
-  // Create a new window for printing
-  const printWindow = window.open("", "_blank");
-  if (!printWindow) {
-    alert("Please allow pop-ups to print the QR code.");
-    return;
-  }
-
-  // Write the print template content to the new window
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>${props.event?.title || "Event"} - QR Code</title>
-        <style>
-          @media print {
-            body {
-              margin: 0;
-              padding: 0;
-            }
-            .vcard {
-              page-break-inside: avoid;
-            }
-          }
-          ${getComputedStyle(printTemplate.value).cssText}
-        </style>
-      </head>
-      <body>
-        ${printTemplate.value.innerHTML}
-      </body>
-    </html>
-  `);
-
-  // Wait for images to load before printing
-  printWindow.document.addEventListener(
-    "load",
-    () => {
-      printWindow.print();
-      printWindow.close();
-    },
-    { once: true },
-  );
-
-  // Fallback if load event doesn't fire
-  setTimeout(() => {
-    printWindow.print();
-    printWindow.close();
-  }, 1000);
+  // Open the print-qr page in a new tab with the event ID
+  const printUrl = `/event/print-invitation?tokenId=${props.event.id}`;
+  window.open(printUrl, "_blank");
 }
 </script>
 
@@ -265,63 +203,5 @@ function printQRCode() {
 .error-message {
   color: #c62828;
   padding: 20px;
-}
-
-/* Print template styles */
-.print-template {
-  display: none; /* Hidden by default */
-}
-
-@media print {
-  .print-template {
-    display: block;
-  }
-}
-
-.vcard {
-  width: 100%;
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-  box-sizing: border-box;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  font-family: Arial, sans-serif;
-}
-
-.logo-container {
-  margin-bottom: 20px;
-}
-
-.logo {
-  max-width: 150px;
-  height: auto;
-}
-
-.event-title {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.qr-code-print {
-  margin: 20px auto;
-  width: 300px;
-  height: 300px;
-}
-
-.qr-code-print img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.invitation-text {
-  font-size: 18px;
-  margin-bottom: 10px;
-  color: #555;
 }
 </style>
