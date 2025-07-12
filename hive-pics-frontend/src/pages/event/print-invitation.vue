@@ -16,7 +16,7 @@
 
   <div>
     <!-- Container used only for printing with print.js -->
-    <div id="printable-cards" class="print-only-off">
+    <div id="printable-cards" class="print-only">
       <!-- Grid of invitation cards for printing on A4 paper (2x4 grid) -->
       <div class="invitation-card-grid">
         <!-- Repeat the invitation card 8 times to fill an A4 page (2x4) -->
@@ -34,7 +34,6 @@
 </template>
 
 <script setup lang="ts">
-import printJS from "print-js";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -50,90 +49,18 @@ const eventTitle = ref("Join Our Event");
 const baseUrl = window.location.origin;
 const invitationLink = `${baseUrl}/event/join?t=${tokenId}`;
 
-// Trigger printing function
 function triggerPrint() {
-  // Wait a moment for images to load
   setTimeout(() => {
-    // Get the printable container
-    const printableContainer = document.querySelector(
-      "#printable-cards",
-    ) as HTMLElement;
-
-    if (printableContainer) {
-      // Temporarily make it visible for print.js
-      // Save original styles
-      const originalStyles = {
-        position: printableContainer.style.position,
-        left: printableContainer.style.left,
-        top: printableContainer.style.top,
-        visibility: printableContainer.style.visibility,
-        opacity: printableContainer.style.opacity,
-        zIndex: printableContainer.style.zIndex,
-      };
-
-      // Make it visible but keep it out of the way
-      printableContainer.style.position = "fixed";
-      printableContainer.style.left = "0";
-      printableContainer.style.top = "0";
-      printableContainer.style.visibility = "visible";
-      printableContainer.style.opacity = "1";
-      printableContainer.style.zIndex = "-1"; // Behind everything else
-
-      // Use print.js to print the invitation cards
-      printJS({
-        printable: "printable-cards",
-        type: "html",
-        documentTitle: "Event Invitation",
-        // Use the styles defined in this component
-        style: `
-          @page {
-            size: A4;
-            margin: 10mm;
-          }
-          .invitation-card-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 105mm); /* 2 columns of DIN A7 width */
-            grid-template-rows: repeat(4, 74mm); /* 4 rows of DIN A7 height */
-            grid-gap: 5mm;
-            justify-content: center;
-          }
-          .invitation-wrapper {
-            width: 105mm;
-            height: 74mm;
-            page-break-inside: avoid;
-          }
-          .invitation-card {
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: none;
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
-        `,
-        onPrintDialogClose: () => {
-          // Restore original styles
-          printableContainer.style.position = originalStyles.position;
-          printableContainer.style.left = originalStyles.left;
-          printableContainer.style.top = originalStyles.top;
-          printableContainer.style.visibility = originalStyles.visibility;
-          printableContainer.style.opacity = originalStyles.opacity;
-          printableContainer.style.zIndex = originalStyles.zIndex;
-
-          // Close the window after printing
-          setTimeout(() => {
-            window.close();
-          }, 500);
-        },
-      });
-    } else {
-      console.error("Printable container not found");
-    }
+    window.print();
   }, 1000);
+
 }
 
 // No longer automatically trigger printing on mount
 // Users can now click the Print button when they're ready
 onMounted(() => {
   // Initialize any required data
+  triggerPrint();
 });
 </script>
 
@@ -190,7 +117,7 @@ onMounted(() => {
 
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 0;
   }
 }
 </style>
