@@ -50,10 +50,10 @@ const baseUrl = window.location.origin;
 const invitationLink = `${baseUrl}/event/join?t=${tokenId}`;
 
 function triggerPrint() {
+  // wait a little bit, to make sure all images have been loaded
   setTimeout(() => {
     window.print();
   }, 1000);
-
 }
 
 // No longer automatically trigger printing on mount
