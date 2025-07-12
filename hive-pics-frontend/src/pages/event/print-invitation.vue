@@ -45,21 +45,55 @@ const tokenId = route.query.tokenId as string;
 // Default event title (always using DIN A7 size)
 const eventTitle = ref("Join Our Event");
 
-// Create the invitation link
-const baseUrl = window.location.origin;
-const invitationLink = `${baseUrl}/event/join?t=${tokenId}`;
-
 function triggerPrint() {
-  // wait a little bit, to make sure all images have been loaded
-  setTimeout(() => {
+  // Get all images in both the preview and printable areas
+  const allImages = Array.from(document.querySelectorAll('img'));
+
+  if (allImages.length === 0) {
+    // No images to wait for, print immediately
     window.print();
-  }, 1000);
+    return;
+  }
+
+  // Track loading status of all images
+  let loadedImages = 0;
+  const totalImages = allImages.length;
+  let hasPrinted = false;
+
+  // Function to check if all images are loaded and trigger print
+  const checkAllImagesLoaded = () => {
+    loadedImages++;
+    if (loadedImages === totalImages && !hasPrinted) {
+      hasPrinted = true;
+      clearTimeout(fallbackTimeout); // Clear the fallback timeout
+      window.print();
+    }
+  };
+
+  // Set a fallback timeout in case some images never load
+  const fallbackTimeout = setTimeout(() => {
+    if (!hasPrinted) {
+      console.warn(`Printing triggered by fallback timeout. ${loadedImages} of ${totalImages} images loaded.`);
+      hasPrinted = true;
+      window.print();
+    }
+  }, 5000); // 5 second fallback timeout
+
+  // Check each image's loading status
+  for (const img of allImages) {
+    if (img.complete && img.naturalHeight !== 0) {
+      // Image is already loaded and has content
+      checkAllImagesLoaded();
+    } else {
+      // Wait for image to load
+      img.addEventListener('load', checkAllImagesLoaded);
+      // Handle error case to avoid getting stuck
+      img.addEventListener('error', checkAllImagesLoaded);
+    }
+  }
 }
 
-// No longer automatically trigger printing on mount
-// Users can now click the Print button when they're ready
 onMounted(() => {
-  // Initialize any required data
   triggerPrint();
 });
 </script>
